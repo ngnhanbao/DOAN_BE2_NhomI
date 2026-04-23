@@ -12,7 +12,15 @@ Route::get('/search-ajax', [App\Http\Controllers\ProductController::class, 'sear
 Route::get('/product/{id}', [App\Http\Controllers\ProductController::class, 'show'])->name('product.show');
 
 // ---------------------------------------------------
-// Các route của Trung, Trang, Thực sẽ viết tiếp xuống đây...
+// Các route của Trung
+// ---------------------------------------------------
+
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::resource('categories', App\Http\Controllers\Admin\CategoryController::class);
+});
+
+// ---------------------------------------------------
+// Các route của Trang, Thực sẽ viết tiếp xuống đây...
 // ---------------------------------------------------
 // hiển thị form login
 Route::get('/login', [CrudUserController::class, 'showLogin']);
