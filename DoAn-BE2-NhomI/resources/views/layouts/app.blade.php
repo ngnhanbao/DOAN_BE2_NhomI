@@ -122,9 +122,17 @@
                 </div>
             </div>
             <div class="flex items-center gap-6 flex-1 max-w-xl mx-12">
-                <div class="relative w-full">
-                    <input class="w-full bg-white/20 border-none rounded-full py-2.5 px-6 text-sm text-white placeholder-slate-200 focus:ring-2 focus:ring-white/50 transition-all" placeholder="Tìm kiếm sản phẩm công nghệ..." type="text" />
+                <div class="relative w-full" id="search-container">
+                    <input
+                        id="search-input"
+                        class="w-full bg-white/20 border-none rounded-full py-2.5 px-6 text-sm text-white placeholder-slate-200 focus:ring-2 focus:ring-white/50 transition-all"
+                        placeholder="Tìm kiếm sản phẩm công nghệ..."
+                        type="text"
+                        autocomplete="off" />
                     <span class="material-symbols-outlined absolute right-4 top-2.5 text-white/90">search</span>
+
+                    <div id="search-results" class="absolute w-full bg-white mt-2 rounded-xl shadow-2xl overflow-hidden hidden z-[100] text-on-surface">
+                    </div>
                 </div>
             </div>
             <div class="flex items-center gap-6 text-white">
@@ -191,6 +199,7 @@
             </div>
         </div>
     </footer>
+    <script src="{{ asset('js/search.js') }}"></script>
 </body>
 
 </html>
