@@ -11,6 +11,7 @@ class User extends Authenticatable
     protected $primaryKey = 'user_id'; // khóa chính không phải id mà là user_id
 
     public $incrementing = true; // khóa chính tự tăng
+    public $timestamps = false; // Bỏ qua updated_at và created_at tự động của Laravel
 
     // các cột cho phép insert/update
     protected $fillable = [

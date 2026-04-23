@@ -19,3 +19,8 @@ Route::get('/login', [CrudUserController::class, 'showLogin']);
 
 // xử lý login khi submit form
 Route::post('/login', [CrudUserController::class, 'login']);
+
+// hiển thị form đăng ký
+Route::get('/register', [CrudUserController::class, 'showRegister']);
+// xử lý đăng ký
+Route::post('/register', [CrudUserController::class, 'register']);

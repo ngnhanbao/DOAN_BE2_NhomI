@@ -280,7 +280,7 @@
                     </form>
                     <!-- Form Footer -->
                     <div class="mt-10 pt-10 border-t border-surface-container flex flex-col items-center space-y-4">
-                        <p class="text-sm text-on-surface-variant font-medium">Bạn chưa có tài khoản?</p>
+                        <a href="/register" class="text-sm text-primary font-bold hover:underline">Bạn chưa có tài khoản?</a>
                         <a class="text-primary font-black hover:underline uppercase tracking-widest text-[11px]"
                             href="#">Liên hệ Quản trị viên</a>
                     </div>
