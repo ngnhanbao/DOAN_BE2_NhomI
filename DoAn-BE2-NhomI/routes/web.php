@@ -24,3 +24,6 @@ Route::post('/login', [CrudUserController::class, 'login']);
 Route::get('/register', [CrudUserController::class, 'showRegister']);
 // xử lý đăng ký
 Route::post('/register', [CrudUserController::class, 'register']);
+
+//chi tiết sản phẩm
+Route::get('/product/{id}', [HomeController::class, 'detail']);
