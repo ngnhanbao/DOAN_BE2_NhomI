@@ -61,11 +61,41 @@ class CategoryController extends Controller
         return redirect()->route('admin.categories.index')->with('success', 'Thêm danh mục thành công');
     }
 
-    public function show(string $id)
+    public function edit(string $id)
     {
-        //
+        $category = \App\Models\Category::findOrFail($id);
+        $parentCategories = \App\Models\Category::whereNull('parent_id')->where('category_id', '!=', $id)->get();
+        return view('admin.categories.edit', compact('category', 'parentCategories'));
     }
 
+    public function update(Request $request, string $id)
+    {
+        $category = \App\Models\Category::findOrFail($id);
 
-    
+        $request->validate([
+            'name' => 'required|max:40',
+            'slug' => 'required|unique:categories,slug,' . $category->category_id . ',category_id',
+            'parent_id' => 'nullable|exists:categories,category_id',
+            'sort_order' => 'nullable|integer',
+            'icon_url' => 'nullable|string|max:500',
+        ], [
+            'name.required' => 'Vui lòng nhập tên danh mục.',
+            'name.max' => 'Tên danh mục không được vượt quá 40 ký tự.',
+            'slug.required' => 'Vui lòng nhập đường dẫn (slug).',
+            'slug.unique' => 'Slug này đã được sử dụng bởi danh mục khác.',
+            'sort_order.integer' => 'Vui lòng nhập số nguyên.',
+            'parent_id.exists' => 'Danh mục cha không hợp lệ.'
+        ]);
+
+        $category->update([
+            'name' => $request->name,
+            'slug' => $request->slug,
+            'parent_id' => $request->parent_id,
+            'icon_url' => $request->icon_url,
+            'sort_order' => $request->sort_order ?? 0,
+            'is_active' => $request->has('is_active') ? 1 : 0,
+        ]);
+
+        return redirect()->route('admin.categories.index')->with('success', 'Cập nhật dữ liệu thành công.');
+    }
 }
