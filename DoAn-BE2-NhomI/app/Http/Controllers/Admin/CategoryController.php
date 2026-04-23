@@ -61,6 +61,7 @@ class CategoryController extends Controller
         return redirect()->route('admin.categories.index')->with('success', 'Thêm danh mục thành công');
     }
 
+
     public function edit(string $id)
     {
         $category = \App\Models\Category::findOrFail($id);
@@ -97,5 +98,22 @@ class CategoryController extends Controller
         ]);
 
         return redirect()->route('admin.categories.index')->with('success', 'Cập nhật dữ liệu thành công.');
+    }
+
+    public function destroy(string $id)
+    {
+        $category = \App\Models\Category::findOrFail($id);
+        
+        if ($category->children()->count() > 0) {
+            return redirect()->route('admin.categories.index')->with('error', 'Không thể xóa danh mục đang chứa danh mục con.');
+        }
+
+        if (\Illuminate\Support\Facades\DB::table('products')->where('category_id', $id)->exists()) {
+            return redirect()->route('admin.categories.index')->with('error', 'Không thể xóa danh mục đang chứa sản phẩm.');
+        }
+
+        $category->delete();
+
+        return redirect()->route('admin.categories.index')->with('success', 'Đã xóa danh mục.');
     }
 }
