@@ -19,3 +19,6 @@ Route::get('/login', [CrudUserController::class, 'showLogin']);
 
 // xử lý login khi submit form
 Route::post('/login', [CrudUserController::class, 'login']);
+
+//chi tiết sản phẩm
+Route::get('/product/{id}', [HomeController::class, 'detail']);
