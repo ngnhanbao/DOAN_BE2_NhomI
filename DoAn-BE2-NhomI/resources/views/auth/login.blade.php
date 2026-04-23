@@ -216,12 +216,17 @@
                             {{ session('error') }}
                         </div>
                     @endif
+                    @if(session('success'))
+                        <div style="color:#0FAF62; margin-bottom:10px; font-weight:bold;">
+                            {{ session('success') }}
+                        </div>
+                    @endif
                     <form method="POST" action="/login" class="space-y-8">
                         @csrf
                         <!-- Identifier Field -->
                         <div class="space-y-2">
                             <label class="block text-[11px] font-black uppercase tracking-[0.2em] text-primary"
-                                for="identifier">Email hoặc Tên đăng nhập</label>
+                                for="identifier">Email</label>
                             <div class="relative group">
                                 <div
                                     class="absolute inset-y-0 left-0 flex items-center pl-0 pointer-events-none text-outline-variant group-focus-within:text-primary transition-colors">
