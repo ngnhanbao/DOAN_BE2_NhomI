@@ -132,9 +132,9 @@
                     <span class="material-symbols-outlined text-3xl" data-icon="shopping_cart">shopping_cart</span>
                     <span class="absolute -top-1 -right-2 bg-error text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold border-2 border-[#003366]">3</span>
                 </button>
-                <button class="hover:opacity-80 transition-opacity active:scale-95 duration-150">
+                <a href="/login" class="hover:opacity-80 transition-opacity active:scale-95 duration-150">
                     <span class="material-symbols-outlined text-3xl" data-icon="account_circle">account_circle</span>
-                </button>
+                </a>
             </div>
         </div>
     </nav>
