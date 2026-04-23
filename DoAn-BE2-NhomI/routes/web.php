@@ -35,3 +35,11 @@ Route::post('/register', [CrudUserController::class, 'register']);
 
 //chi tiết sản phẩm
 Route::get('/product/{id}', [HomeController::class, 'detail']);
+
+
+// hiển thị form đổi mật khẩu
+Route::get('/password/change', [CrudUserController::class, 'showChangePassword'])->middleware('auth');
+
+// xử lý đổi mật khẩu
+Route::post('/password/change', [CrudUserController::class, 'changePassword'])->middleware('auth');
+
