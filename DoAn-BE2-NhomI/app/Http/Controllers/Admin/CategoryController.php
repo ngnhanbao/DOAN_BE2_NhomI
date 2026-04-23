@@ -26,6 +26,12 @@ class CategoryController extends Controller
         return view('admin.categories.index', compact('categories', 'totalCategories', 'rootCategories', 'activeCategories', 'hiddenCategories'));
     }
 
+    public function create()
+    {
+        $parentCategories = \App\Models\Category::whereNull('parent_id')->get();
+        return view('admin.categories.create', compact('parentCategories'));
+    }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -54,4 +60,12 @@ class CategoryController extends Controller
 
         return redirect()->route('admin.categories.index')->with('success', 'Thêm danh mục thành công');
     }
+
+    public function show(string $id)
+    {
+        //
+    }
+
+
+    
 }
