@@ -19,14 +19,9 @@ public function login(Request $request)
     $login = $request->identifier; // email hoặc username
     $password = $request->password; // mật khẩu
 
-    // kiểm tra người dùng nhập email hay username
-    $field = filter_var($login, FILTER_VALIDATE_EMAIL) 
-            ? 'email'     // nếu là email → dùng cột email
-            : 'username'; // nếu không → dùng username
-
-    // thử đăng nhập
+    // thử đăng nhập bằng email
     if (Auth::attempt([
-        $field => $login,     // email hoặc username
+        'email' => $login,
         'password' => $password, // mật khẩu người dùng nhập
         'is_active' => 1      // chỉ cho login nếu active = 1
     ])) {
@@ -37,6 +32,41 @@ public function login(Request $request)
 
     // nếu sai → quay lại form + báo lỗi
     return back()->with('error', 'Sai tài khoản hoặc mật khẩu');
+}
+
+public function showRegister()
+{
+    return view('auth.register');
+}
+
+public function register(Request $request)
+{
+    $request->validate([
+        'full_name' => 'required|string|max:100',
+        'email' => 'required|string|email|max:100|unique:users',
+        'phone' => 'required|string|max:20',
+        'password' => 'required|string|min:6|confirmed',
+    ], [
+        'full_name.required' => 'Vui lòng nhập họ và tên.',
+        'email.required' => 'Vui lòng nhập email.',
+        'email.email' => 'Email không hợp lệ.',
+        'email.unique' => 'Email này đã được đăng ký.',
+        'phone.required' => 'Vui lòng nhập số điện thoại.',
+        'password.required' => 'Vui lòng nhập mật khẩu.',
+        'password.min' => 'Mật khẩu phải có ít nhất 6 ký tự.',
+        'password.confirmed' => 'Xác nhận mật khẩu không khớp.',
+    ]);
+
+    User::create([
+        'full_name' => $request->full_name,
+        'email' => $request->email,
+        'phone' => $request->phone,
+        'password_hash' => \Illuminate\Support\Facades\Hash::make($request->password),
+        'role' => 'user',
+        'is_active' => 1
+    ]);
+
+    return redirect('/login')->with('success', 'Đăng ký thành công! Vui lòng đăng nhập.');
 }
 
 }
