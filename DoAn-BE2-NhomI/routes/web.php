@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController; 
 use App\Http\Controllers\CrudUserController;
+use App\Http\Controllers\Admin\VoucherController;
 
 // Khai báo đường dẫn trang chủ 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -35,3 +36,14 @@ Route::post('/register', [CrudUserController::class, 'register']);
 
 //chi tiết sản phẩm
 Route::get('/product/{id}', [HomeController::class, 'detail']);
+
+// hiển thị form đổi mật khẩu
+Route::get('/password/change', [CrudUserController::class, 'showChangePassword'])->middleware('auth');
+
+// xử lý đổi mật khẩu
+Route::post('/password/change', [CrudUserController::class, 'changePassword'])->middleware('auth');
+
+// quản lí Voucher 
+Route::prefix('admin')->middleware(['auth'])->group(function () {
+    Route::resource('vouchers', App\Http\Controllers\Admin\VoucherController::class);
+});
