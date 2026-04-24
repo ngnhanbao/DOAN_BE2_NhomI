@@ -24,7 +24,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 // Các route của Trang, Thực sẽ viết tiếp xuống đây...
 // ---------------------------------------------------
 // hiển thị form login
-Route::get('/login', [CrudUserController::class, 'showLogin']);
+Route::get('/login', [CrudUserController::class, 'showLogin'])->name('login');
 
 // xử lý login khi submit form
 Route::post('/login', [CrudUserController::class, 'login']);

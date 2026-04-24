@@ -72,7 +72,7 @@
                 <p class="text-blue-200 mt-2 text-sm font-medium tracking-wide uppercase">Hệ sinh thái kỹ thuật B-Tris</p>
             </div>
             <div class="flex gap-4">
-                <a href="{{ url('/admin/dashboard') }}" class="vibrant-btn text-white/80 px-6 py-3 rounded-xl font-bold uppercase tracking-wider text-sm flex items-center gap-2 border border-white/10 bg-transparent hover:text-white">
+                <a href="{{ url('/') }}" class="vibrant-btn text-white/80 px-6 py-3 rounded-xl font-bold uppercase tracking-wider text-sm flex items-center gap-2 border border-white/10 bg-transparent hover:text-white">
                     <span class="material-symbols-outlined text-lg">dashboard</span>
                     Trang chủ
                 </a>
