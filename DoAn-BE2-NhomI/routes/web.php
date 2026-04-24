@@ -37,6 +37,19 @@ Route::post('/register', [CrudUserController::class, 'register']);
 //chi tiết sản phẩm
 Route::get('/product/{id}', [HomeController::class, 'detail']);
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 //xử lý logout
 Route::post('/logout', function () {
     Auth::logout();
