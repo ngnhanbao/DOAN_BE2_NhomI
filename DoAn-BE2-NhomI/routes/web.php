@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController; 
+use App\Http\Controllers\CrudUserController;
 
 // Khai báo đường dẫn trang chủ 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -21,3 +22,24 @@ Route::prefix('admin')->name('admin.')->group(function () {
 // ---------------------------------------------------
 // Các route của Trang, Thực sẽ viết tiếp xuống đây...
 // ---------------------------------------------------
+// hiển thị form login
+Route::get('/login', [CrudUserController::class, 'showLogin']);
+
+// xử lý login khi submit form
+Route::post('/login', [CrudUserController::class, 'login']);
+
+// hiển thị form đăng ký
+Route::get('/register', [CrudUserController::class, 'showRegister']);
+// xử lý đăng ký
+Route::post('/register', [CrudUserController::class, 'register']);
+
+//chi tiết sản phẩm
+Route::get('/product/{id}', [HomeController::class, 'detail']);
+
+
+// hiển thị form đổi mật khẩu
+Route::get('/password/change', [CrudUserController::class, 'showChangePassword'])->middleware('auth');
+
+// xử lý đổi mật khẩu
+Route::post('/password/change', [CrudUserController::class, 'changePassword'])->middleware('auth');
+
