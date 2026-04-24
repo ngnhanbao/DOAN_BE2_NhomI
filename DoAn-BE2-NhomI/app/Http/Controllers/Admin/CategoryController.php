@@ -63,14 +63,20 @@ class CategoryController extends Controller
 
     public function edit(string $id)
     {
-        $category = \App\Models\Category::findOrFail($id);
+        $category = \App\Models\Category::find($id);
+        if (!$category) {
+            return redirect()->route('admin.categories.index')->with('error', 'Không tìm thấy danh mục này!');
+        }
         $parentCategories = \App\Models\Category::whereNull('parent_id')->where('category_id', '!=', $id)->get();
         return view('admin.categories.edit', compact('category', 'parentCategories'));
     }
 
     public function update(Request $request, string $id)
     {
-        $category = \App\Models\Category::findOrFail($id);
+        $category = \App\Models\Category::find($id);
+        if (!$category) {
+            return redirect()->route('admin.categories.index')->with('error', 'Không tìm thấy danh mục này!');
+        }
 
         $request->validate([
             'name' => 'required|max:40',
