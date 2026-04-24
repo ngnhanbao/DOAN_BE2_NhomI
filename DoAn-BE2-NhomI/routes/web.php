@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\HomeController;
+use App\Http\Controllers\HomeController; 
 use App\Http\Controllers\CrudUserController;
 
 // Khai báo đường dẫn trang chủ 
@@ -37,17 +37,11 @@ Route::post('/register', [CrudUserController::class, 'register']);
 Route::get('/product/{id}', [HomeController::class, 'detail']);
 
 
+// hiển thị form đổi mật khẩu
+Route::get('/password/change', [CrudUserController::class, 'showChangePassword'])->middleware('auth');
 
-
-
-
-
-
-
-
-
-
-
+// xử lý đổi mật khẩu
+Route::post('/password/change', [CrudUserController::class, 'changePassword'])->middleware('auth');
 
 //xử lý logout
 Route::post('/logout', function () {
