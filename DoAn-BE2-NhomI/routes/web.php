@@ -43,6 +43,12 @@ Route::get('/product/{id}', [HomeController::class, 'detail']);
 
 
 
+
+
+
+
+
+
 //xử lý logout
 Route::post('/logout', function () {
     Auth::logout();
