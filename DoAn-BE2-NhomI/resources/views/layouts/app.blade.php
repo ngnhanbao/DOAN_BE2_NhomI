@@ -168,8 +168,6 @@
                             <span class="font-semibold">
                                 {{ Auth::user()->full_name }}
                             </span>
-
-                            ▼
                         </div>
 
                         {{-- ===== DROPDOWN ===== --}}
