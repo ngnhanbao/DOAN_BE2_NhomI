@@ -166,7 +166,7 @@
 
                             {{-- TÊN USER --}}
                             <span class="font-semibold">
-                                {{ Auth::user()->username }}
+                                {{ Auth::user()->full_name }}
                             </span>
 
                             ▼
@@ -198,9 +198,9 @@
                 @else
 
                     {{-- ===== CHƯA LOGIN ===== --}}
-                   <a href="{{ url('/login') }}">
-    <span class="material-symbols-outlined">account_circle</span>
-</a>
+                    <a href="{{ url('/login') }}">
+                        <span class="material-symbols-outlined">account_circle</span> Đăng nhập
+                    </a>
 
                 @endif
             </div>
