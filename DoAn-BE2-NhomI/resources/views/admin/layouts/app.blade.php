@@ -6,6 +6,7 @@
     <title>Admin - B-Tris</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #F4F5F7; }
@@ -21,6 +22,11 @@
             <a href="#" class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50">
                 <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Bảng điều khiển
             </a>
+            
+            <a href="#" class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50">
+                <i data-lucide="tag" class="w-5 h-5"></i> Thương hiệu
+            </a>
+
             <a href="{{ route('admin.categories.index') }}" class="flex items-center gap-3 px-4 py-3 text-sm font-medium {{ request()->routeIs('admin.categories.*') ? 'bg-[#0A2540] text-white' : 'text-gray-600 hover:bg-gray-50' }} rounded-lg">
                 <i data-lucide="boxes" class="w-5 h-5"></i> Danh mục
             </a>
