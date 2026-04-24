@@ -15,28 +15,50 @@ public function showLogin()
 // xử lý login
 public function login(Request $request)
 {
-    // lấy dữ liệu người dùng nhập
-    $login = $request->identifier; // email hoặc username
-    $password = $request->password; // mật khẩu
+    // ================== 1. VALIDATE ==================
+    // bắt buộc nhập email + password, email phải đúng định dạng
+    $request->validate([
+        'email' => 'required|email',   // bắt buộc + đúng format email
+        'password' => 'required'       // bắt buộc nhập mật khẩu
+    ], [
+        'email.required' => 'Vui lòng nhập email.',
+        'email.email' => 'Định dạng email không hợp lệ.',
+        'password.required' => 'Vui lòng nhập mật khẩu.'
+    ]);
 
-    // kiểm tra người dùng nhập email hay username
-    $field = filter_var($login, FILTER_VALIDATE_EMAIL) 
-            ? 'email'     // nếu là email → dùng cột email
-            : 'username'; // nếu không → dùng username
+    // ================== 2. LẤY DỮ LIỆU ==================
+    $email = $request->email;
+    $password = $request->password;
 
-    // thử đăng nhập
-    if (Auth::attempt([
-        $field => $login,     // email hoặc username
-        'password' => $password, // mật khẩu người dùng nhập
-        'is_active' => 1      // chỉ cho login nếu active = 1
-    ])) {
+    // ================== 3. KIỂM TRA USER ==================
+    $user = \App\Models\User::where('email', $email)->first();
 
-        // nếu đúng → chuyển về trang chủ
-        return redirect('/');
+    if (!$user) {
+        // không tồn tại email
+        return back()
+    ->with('error', 'Sai tài khoản hoặc mật khẩu')
+    ->withInput();
     }
 
-    // nếu sai → quay lại form + báo lỗi
-    return back()->with('error', 'Sai tài khoản hoặc mật khẩu');
+    // ================== 4. CHECK TÀI KHOẢN BỊ KHÓA ==================
+    if ($user->is_active == 0) {
+        return back()->with('error', 'Tài khoản của bạn đã bị khóa.');
+    }
+
+    // ================== 5. GHI NHỚ LOGIN ==================
+    $remember = $request->has('remember');
+
+    // ================== 6. ĐĂNG NHẬP ==================
+    if (Auth::attempt([
+        'email' => $email,
+        'password' => $password
+    ], $remember)) {
+
+        return redirect('/')->with('success', 'Đăng nhập thành công!');
+    }
+
+    // ================== 7. SAI PASSWORD ==================
+    return back()->with('error', 'Tài khoản hoặc mật khẩu không chính xác.');
 }
 
 }
