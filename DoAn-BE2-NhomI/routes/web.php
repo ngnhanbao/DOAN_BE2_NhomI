@@ -17,6 +17,7 @@ Route::get('/product/{id}', [App\Http\Controllers\ProductController::class, 'sho
 
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::resource('categories', App\Http\Controllers\Admin\CategoryController::class);
+    Route::view('/brands/create', 'admin.brands.create')->name('brands.create');
 });
 
 // ---------------------------------------------------
