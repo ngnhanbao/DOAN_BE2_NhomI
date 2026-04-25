@@ -5,6 +5,7 @@
     name: '',
     slug: '',
     logoUrl: '',
+    logo: '',
     description: '',
     isActive: true,
     generateSlug() {
