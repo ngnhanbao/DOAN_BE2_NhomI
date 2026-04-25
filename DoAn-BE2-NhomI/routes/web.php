@@ -17,9 +17,6 @@ Route::get('/product/{id}', [App\Http\Controllers\ProductController::class, 'sho
 // Các route của Trung
 // ---------------------------------------------------
 
-Route::prefix('admin')->name('admin.')->group(function () {
-    Route::resource('categories', App\Http\Controllers\Admin\CategoryController::class);
-});
 
 // ---------------------------------------------------
 // Các route của Trang, Thực sẽ viết tiếp xuống đây...
@@ -43,3 +40,12 @@ Route::post('/logout', function () {
     Auth::logout();
     return redirect('/');
 })->name('logout');
+
+// xử lí thương hiệu 
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::resource('categories', App\Http\Controllers\Admin\CategoryController::class);
+
+    // Đặt route toggle TRƯỚC resource để tránh bị resource route đè
+    Route::patch('brands/{id}/toggle-status', [App\Http\Controllers\Admin\BrandController::class, 'toggleStatus'])->name('brands.toggleStatus');
+    Route::resource('brands', App\Http\Controllers\Admin\BrandController::class);
+});

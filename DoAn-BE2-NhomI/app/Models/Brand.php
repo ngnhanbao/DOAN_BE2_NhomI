@@ -6,5 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class Brand extends Model
 {
-    //
+    protected $table = 'brands';
+    protected $primaryKey = 'brand_id';
+    public $timestamps = false;
+
+    protected $fillable = [
+        'name',
+        'slug',
+        'logo_url',
+        'description',
+        'country',
+        'is_active',
+    ];
 }

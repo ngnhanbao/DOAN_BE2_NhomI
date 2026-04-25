@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('brands', function (Blueprint $table) {
             $table->id();
+            $table->string('name', 100);
+            $table->string('slug', 100)->unique();
+            $table->string('logo_url')->nullable();
+            $table->text('description')->nullable();
+            $table->string('country', 50)->nullable();
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }
