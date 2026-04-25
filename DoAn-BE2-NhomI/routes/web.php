@@ -14,38 +14,44 @@ Route::get('/search-ajax', [App\Http\Controllers\ProductController::class, 'sear
 Route::get('/product/{id}', [App\Http\Controllers\ProductController::class, 'show'])->name('product.show');
 
 // ---------------------------------------------------
-// Các route của Trung
+// Các route của Trung & Trang
 // ---------------------------------------------------
 
+// Quản trị viên
+Route::prefix('admin')->name('admin.')->group(function () {
+    // Categories
+    Route::resource('categories', App\Http\Controllers\Admin\CategoryController::class);
+
+    // Brands
+    // Đặt route toggle TRƯỚC resource để tránh bị resource route đè
+    Route::patch('brands/{id}/toggle-status', [App\Http\Controllers\Admin\BrandController::class, 'toggleStatus'])->name('brands.toggleStatus');
+    Route::resource('brands', App\Http\Controllers\Admin\BrandController::class);
+    
+    // Vouchers (thêm vào group admin chung)
+    Route::resource('vouchers', App\Http\Controllers\Admin\VoucherController::class)->middleware('auth');
+});
 
 // ---------------------------------------------------
-// Các route của Trang, Thực sẽ viết tiếp xuống đây...
+// Xác thực & Người dùng
 // ---------------------------------------------------
-// hiển thị form login
-Route::get('/login', [CrudUserController::class, 'showLogin']);
 
-// xử lý login khi submit form
+// Login
+Route::get('/login', [CrudUserController::class, 'showLogin'])->name('login');
 Route::post('/login', [CrudUserController::class, 'login']);
 
-// hiển thị form đăng ký
+// Register
 Route::get('/register', [CrudUserController::class, 'showRegister']);
-// xử lý đăng ký
 Route::post('/register', [CrudUserController::class, 'register']);
 
-//chi tiết sản phẩm
-Route::get('/product/{id}', [HomeController::class, 'detail']);
-
-//xử lý logout
+// Logout
 Route::post('/logout', function () {
     Auth::logout();
     return redirect('/');
 })->name('logout');
 
-// xử lí thương hiệu 
-Route::prefix('admin')->name('admin.')->group(function () {
-    Route::resource('categories', App\Http\Controllers\Admin\CategoryController::class);
+// Password Change
+Route::get('/password/change', [CrudUserController::class, 'showChangePassword'])->middleware('auth');
+Route::post('/password/change', [CrudUserController::class, 'changePassword'])->middleware('auth');
 
-    // Đặt route toggle TRƯỚC resource để tránh bị resource route đè
-    Route::patch('brands/{id}/toggle-status', [App\Http\Controllers\Admin\BrandController::class, 'toggleStatus'])->name('brands.toggleStatus');
-    Route::resource('brands', App\Http\Controllers\Admin\BrandController::class);
-});
+// Chi tiết sản phẩm (fallback or user route)
+Route::get('/product-detail/{id}', [HomeController::class, 'detail']);
