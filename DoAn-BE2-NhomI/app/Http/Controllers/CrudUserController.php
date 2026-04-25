@@ -25,6 +25,12 @@ public function login(Request $request)
         'password' => $password, // mật khẩu người dùng nhập
         'is_active' => 1      // chỉ cho login nếu active = 1
     ])) {
+        $user = Auth::user();
+        
+        // Nếu là admin -> vào trang quản trị
+        if ($user->role === 'admin') {
+            return redirect('/admin/categories');
+        }
 
         // nếu đúng → chuyển về trang chủ
         return redirect('/');

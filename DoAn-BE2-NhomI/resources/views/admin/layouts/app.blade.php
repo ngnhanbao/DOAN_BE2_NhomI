@@ -24,7 +24,10 @@
             <a href="{{ route('admin.categories.index') }}" class="flex items-center gap-3 px-4 py-3 text-sm font-medium {{ request()->routeIs('admin.categories.*') ? 'bg-[#0A2540] text-white' : 'text-gray-600 hover:bg-gray-50' }} rounded-lg">
                 <i data-lucide="boxes" class="w-5 h-5"></i> Danh mục
             </a>
-            <!-- Thêm các menu khác ở đây -->
+         
+            <a href="{{ route('admin.vouchers.index') }}" class="flex items-center gap-3 px-4 py-3 text-sm font-medium {{ request()->routeIs('admin.vouchers.*') ? 'bg-[#0A2540] text-white' : 'text-gray-600 hover:bg-gray-50' }} rounded-lg transition-colors">
+                <i data-lucide="ticket" class="w-5 h-5"></i> Voucher
+            </a>
         </nav>
         <div class="p-4 border-t border-gray-200">
             <div class="flex items-center gap-3">
