@@ -21,12 +21,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::resource('categories', App\Http\Controllers\Admin\CategoryController::class);
     
     // Brands
-    Route::patch('brands/{id}/toggle-status', [App\Http\Controllers\Admin\BrandController::class, 'toggleStatus'])->name('brands.toggleStatus');
     Route::resource('brands', App\Http\Controllers\Admin\BrandController::class);
+    Route::patch('brands/{id}/toggle-status', [App\Http\Controllers\Admin\BrandController::class, 'toggleStatus'])->name('brands.toggleStatus');
     
     // Vouchers
+    Route::get('vouchers', [VoucherController::class, 'index'])->name('vouchers.index');
+    Route::resource('vouchers', VoucherController::class)->except(['index']);
     Route::patch('vouchers/{id}/toggle-status', [VoucherController::class, 'toggleStatus'])->name('vouchers.toggleStatus');
-    Route::resource('vouchers', VoucherController::class)->middleware('auth');
 });
 
 // ---------------------------------------------------
