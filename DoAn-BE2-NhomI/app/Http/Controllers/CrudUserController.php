@@ -33,6 +33,11 @@ public function login(Request $request)
             return redirect('/admin/categories');
         }
 
+        // kiểm tra role, nếu là admin thì chuyển đến trang quản lý danh mục
+        if (Auth::user()->role === 'admin') {
+            return redirect('/admin/categories');
+        }
+
         // nếu đúng → chuyển về trang chủ
         return redirect('/');
     }
