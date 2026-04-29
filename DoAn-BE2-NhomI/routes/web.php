@@ -55,9 +55,12 @@ Route::post('/login', [CrudUserController::class, 'login']);
 Route::get('/register', [CrudUserController::class, 'showRegister'])->name('register');
 Route::post('/register', [CrudUserController::class, 'register']);
 
-//Login Google
+//Login Google & Github
 Route::get('auth/google', [SocialAuthController::class, 'redirectToGoogle'])->name('google.login');
 Route::get('auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback']);
+
+Route::get('auth/github', [SocialAuthController::class, 'redirectToGithub'])->name('github.login');
+Route::get('auth/github/callback', [SocialAuthController::class, 'handleGithubCallback']);
 //chi tiết sản phẩm
 Route::get('/product/{id}', [HomeController::class, 'detail']);
 
