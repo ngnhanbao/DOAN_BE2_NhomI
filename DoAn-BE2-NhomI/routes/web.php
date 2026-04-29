@@ -8,7 +8,8 @@ use App\Http\Controllers\Admin\VoucherController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\ProductController;
-
+use App\Http\Controllers\Auth\SocialAuthController;
+use App\Http\Controllers\OTPController;
 
 
 
@@ -55,6 +56,17 @@ Route::post('/login', [CrudUserController::class, 'login']);
 Route::get('/register', [CrudUserController::class, 'showRegister'])->name('register');
 Route::post('/register', [CrudUserController::class, 'register']);
 
+//Login Google & Github
+Route::get('auth/google', [SocialAuthController::class, 'redirectToGoogle'])->name('google.login');
+Route::get('auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback']);
+
+Route::get('auth/github', [SocialAuthController::class, 'redirectToGithub'])->name('github.login');
+Route::get('auth/github/callback', [SocialAuthController::class, 'handleGithubCallback']);
+
+//Xác thực OTP
+Route::get('/verify-otp', [OTPController::class, 'showVerifyForm'])->name('otp.view');
+Route::post('/verify-otp', [OTPController::class, 'verifyOTP'])->name('otp.verify');
+Route::post('/resend-otp', [OTPController::class, 'resendOTP'])->name('otp.resend');
 
 //chi tiết sản phẩm
 Route::get('/product/{id}', [HomeController::class, 'detail']);

@@ -4,6 +4,9 @@ use App\Models\User;
 use Illuminate\Http\Request; // dùng để lấy dữ liệu từ form
 use Illuminate\Support\Facades\Auth; // dùng cho login/logout
 use Illuminate\Support\Facades\Hash; // đổi mật khẩu 
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\VerifyOTPMail;
 
 class CrudUserController extends Controller
 {
@@ -69,16 +72,34 @@ public function register(Request $request)
         'password.confirmed' => 'Xác nhận mật khẩu không khớp.',
     ]);
 
-    User::create([
+    // 1. Tạo User
+    $user = User::create([
         'full_name' => $request->full_name,
         'email' => $request->email,
         'phone' => $request->phone,
-        'password_hash' => \Illuminate\Support\Facades\Hash::make($request->password),
+        'password_hash' => Hash::make($request->password),
         'role' => 'user',
-        'is_active' => 1    
+        'is_active' => 1,
+        'is_verified' => 0, // Chưa xác thực
     ]);
 
-    return redirect('/login')->with('success', 'Đăng ký thành công! Vui lòng đăng nhập.');
+    // 2. Tạo mã OTP 6 số
+    $otpCode = rand(100000, 999999);
+    
+    DB::table('otp_verifications')->insert([
+        'user_id' => $user->user_id,
+        'otp_code' => $otpCode,
+        'purpose' => 'register',
+        'expires_at' => now()->addMinutes(10),
+    ]);
+
+    // 3. Gửi Mail qua Mailpit
+    Mail::to($user->email)->send(new VerifyOTPMail($otpCode));
+
+    // 4. Lưu ID vào session để biết đang xác thực cho ai
+    session(['otp_user_id' => $user->user_id]);
+
+    return redirect()->route('otp.view');
 }
 public function showChangePassword()
 {
