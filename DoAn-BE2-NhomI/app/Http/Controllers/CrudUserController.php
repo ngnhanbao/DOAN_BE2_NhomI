@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request; // dùng để lấy dữ liệu từ form
 use Illuminate\Support\Facades\Auth; // dùng cho login/logout
+use Illuminate\Support\Facades\Hash; // đổi mật khẩu 
 
 class CrudUserController extends Controller
 {
@@ -25,6 +26,17 @@ public function login(Request $request)
         'password' => $password, // mật khẩu người dùng nhập
         'is_active' => 1      // chỉ cho login nếu active = 1
     ])) {
+        $user = Auth::user();
+        
+        // Nếu là admin -> vào trang quản trị
+        if ($user->role === 'admin') {
+            return redirect('/admin/categories');
+        }
+
+        // kiểm tra role, nếu là admin thì chuyển đến trang quản lý danh mục
+        if (Auth::user()->role === 'admin') {
+            return redirect('/admin/categories');
+        }
 
         // nếu đúng → chuyển về trang chủ
         return redirect('/');
@@ -68,5 +80,40 @@ public function register(Request $request)
 
     return redirect('/login')->with('success', 'Đăng ký thành công! Vui lòng đăng nhập.');
 }
+public function showChangePassword()
+{
+    return view('auth.change_password');
+}
+
+public function changePassword(Request $request)
+{
+    $request->validate([
+        'current_password' => 'required',
+        'new_password' => 'required|min:6|confirmed',
+    ], [
+        'current_password.required' => 'Vui lòng nhập mật khẩu hiện tại.',
+        'new_password.required' => 'Vui lòng nhập mật khẩu mới.',
+        'new_password.min' => 'Mật khẩu mới phải có ít nhất 6 ký tự.',
+        'new_password.confirmed' => 'Xác nhận mật khẩu mới không khớp.',
+    ]);
+
+    $user = Auth::user();
+
+    // kiểm tra mật khẩu hiện tại
+    if (!Hash::check($request->current_password, $user->password_hash)) {
+        return back()->withErrors(['current_password' => 'Mật khẩu hiện tại không đúng.']);
+    }
+
+    // cập nhật mật khẩu mới
+    $user->password_hash = Hash::make($request->new_password);
+    $user->save();
+
+    // đăng xuất session cũ để tránh lỗi
+    Auth::logout();
+
+    // chuyển về trang login
+    return redirect('/login')->with('success', 'Đổi mật khẩu thành công! Vui lòng đăng nhập lại.');
+}
+
 
 }
