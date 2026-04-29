@@ -8,7 +8,7 @@ use App\Http\Controllers\Admin\VoucherController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\ProductController;
-
+use App\Http\Controllers\Auth\SocialAuthController;
 
 
 
@@ -55,7 +55,9 @@ Route::post('/login', [CrudUserController::class, 'login']);
 Route::get('/register', [CrudUserController::class, 'showRegister'])->name('register');
 Route::post('/register', [CrudUserController::class, 'register']);
 
-
+//Login Google
+Route::get('auth/google', [SocialAuthController::class, 'redirectToGoogle'])->name('google.login');
+Route::get('auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback']);
 //chi tiết sản phẩm
 Route::get('/product/{id}', [HomeController::class, 'detail']);
 
