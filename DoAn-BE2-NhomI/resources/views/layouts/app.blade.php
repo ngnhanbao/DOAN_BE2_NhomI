@@ -136,7 +136,7 @@
                     <span class="material-symbols-outlined absolute right-4 top-2.5 text-white/90">search</span>
 
                     <div id="search-results"
-                        class="absolute w-full bg-white mt-2 rounded-xl shadow-2xl overflow-hidden hidden z-[100] text-on-surface">
+                        class="absolute top-full left-0 w-full bg-white mt-2 rounded-xl shadow-2xl overflow-hidden hidden z-[100] text-on-surface">
                     </div>
                 </div>
             </div>
@@ -148,57 +148,57 @@
                 </button>
                 @if(Auth::check())
 
-                    <div class="relative">
+                <div class="relative">
 
-                        {{-- ===== CLICK USER ===== --}}
-                        <div onclick="toggleDropdown()" class="flex items-center gap-2 cursor-pointer">
+                    {{-- ===== CLICK USER ===== --}}
+                    <div onclick="toggleDropdown()" class="flex items-center gap-2 cursor-pointer">
 
-                            {{-- AVATAR --}}
-                            @if(Auth::user()->avatar_url)
-                                <img src="{{ asset(str_replace('public/', '', Auth::user()->avatar_url)) }}"
-                                    class="w-8 h-8 rounded-full object-cover">
-                            @else
-                                {{-- ICON MẶC ĐỊNH --}}
-                                <span class="material-symbols-outlined text-3xl">
-                                    account_circle
-                                </span>
-                            @endif
+                        {{-- AVATAR --}}
+                        @if(Auth::user()->avatar_url)
+                        <img src="{{ asset(str_replace('public/', '', Auth::user()->avatar_url)) }}"
+                            class="w-8 h-8 rounded-full object-cover">
+                        @else
+                        {{-- ICON MẶC ĐỊNH --}}
+                        <span class="material-symbols-outlined text-3xl">
+                            account_circle
+                        </span>
+                        @endif
 
-                            {{-- TÊN USER --}}
-                            <span class="font-semibold">
-                                {{ Auth::user()->full_name }}
-                            </span>
-                        </div>
+                        {{-- TÊN USER --}}
+                        <span class="font-semibold">
+                            {{ Auth::user()->full_name }}
+                        </span>
+                    </div>
 
-                        {{-- ===== DROPDOWN ===== --}}
-                        <div id="dropdownMenu"
-                            class="hidden absolute right-0 mt-2 w-48 bg-white text-black rounded-xl shadow-lg p-2">
+                    {{-- ===== DROPDOWN ===== --}}
+                    <div id="dropdownMenu"
+                        class="hidden absolute right-0 mt-2 w-48 bg-white text-black rounded-xl shadow-lg p-2">
 
-                            <a href="{{ route('profile') }}" class="block px-4 py-2 hover:bg-gray-100 rounded">
-                                Tài khoản
-                            </a>
+                        <a href="{{ route('profile') }}" class="block px-4 py-2 hover:bg-gray-100 rounded">
+                            Tài khoản
+                        </a>
 
-                            <a href="#" class="block px-4 py-2 hover:bg-gray-100 rounded">
-                                Đơn mua
-                            </a>
+                        <a href="#" class="block px-4 py-2 hover:bg-gray-100 rounded">
+                            Đơn mua
+                        </a>
 
-                            <form action="{{ route('logout') }}" method="POST">
-                                @csrf
-                                <button class="w-full text-left px-4 py-2 hover:bg-gray-100 rounded">
-                                    Đăng xuất
-                                </button>
-                            </form>
-
-                        </div>
+                        <form action="{{ route('logout') }}" method="POST">
+                            @csrf
+                            <button class="w-full text-left px-4 py-2 hover:bg-gray-100 rounded">
+                                Đăng xuất
+                            </button>
+                        </form>
 
                     </div>
 
+                </div>
+
                 @else
 
-                    {{-- ===== CHƯA LOGIN ===== --}}
-                    <a href="{{ url('/login') }}">
-                        <span class="material-symbols-outlined">account_circle</span> Đăng nhập
-                    </a>
+                {{-- ===== CHƯA LOGIN ===== --}}
+                <a href="{{ url('/login') }}">
+                    <span class="material-symbols-outlined">account_circle</span> Đăng nhập
+                </a>
 
                 @endif
             </div>
@@ -282,7 +282,7 @@
         }
 
         // click ngoài → đóng
-        document.addEventListener('click', function (e) {
+        document.addEventListener('click', function(e) {
             const dropdown = document.getElementById('dropdownMenu');
             if (!e.target.closest('.relative')) {
                 dropdown?.classList.add('hidden');
