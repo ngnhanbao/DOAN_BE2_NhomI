@@ -141,7 +141,7 @@ Route::post('/password/change', [CrudUserController::class, 'changePassword'])->
 Route::get('/profile', [CrudUserController::class, 'profile'])
     ->middleware('auth')
     ->name('profile');
-    
+
 // update profile
 Route::post('/profile/update', [CrudUserController::class, 'updateProfile'])
     ->name('profile.update')
@@ -180,7 +180,7 @@ Route::middleware('auth')->group(function () {
         [ShippingAddressController::class, 'store']
     )->name('addresses.store');
 
-       // form sửa địa chỉ
+    // form sửa địa chỉ
     Route::get(
         '/change-address/edit/{id}',
         [ShippingAddressController::class, 'edit']
@@ -193,6 +193,12 @@ Route::middleware('auth')->group(function () {
         '/change-address/update/{id}',
         [ShippingAddressController::class, 'update']
     )->name('addresses.update');
+
+    // xoá địa chỉ
+    Route::delete(
+        '/change-address/delete/{id}',
+        [ShippingAddressController::class, 'destroy']
+    )->name('addresses.destroy');
 });
 
 // CART
