@@ -381,12 +381,24 @@
                                     {{-- set default --}}
                                     @if(!$address->is_default)
 
-                                        <button
-                                            class="ml-auto text-gray-500 font-bold text-[10px] uppercase tracking-widest hover:text-blue-900 transition-colors">
+                                        <form
+                                            id="defaultForm{{ $address->address_id }}"
+                                            action="{{ route('addresses.default', $address->address_id) }}"
+                                            method="POST"
+                                            class="ml-auto">
 
-                                            Thiết lập mặc định
+                                            @csrf
 
-                                        </button>
+                                            <button
+                                                type="button"
+                                                onclick="openDefaultModal({{ $address->address_id }})"
+                                                class="text-gray-500 font-bold text-[10px] uppercase tracking-widest hover:text-blue-900 transition-colors">
+
+                                                Thiết lập mặc định
+
+                                            </button>
+
+                                        </form>
 
                                     @endif
 
@@ -538,6 +550,86 @@
 
 
 {{-- ===================================================== --}}
+{{-- DEFAULT MODAL --}}
+{{-- ===================================================== --}}
+<div
+    id="defaultModal"
+    class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+
+    <div
+        class="bg-white rounded-3xl p-8 w-[90%] max-w-md text-center">
+
+        <div
+            class="w-20 h-20 rounded-full bg-blue-100 mx-auto flex items-center justify-center mb-5">
+
+            <span
+                class="material-symbols-outlined text-blue-600 text-5xl">
+
+                location_on
+
+            </span>
+
+        </div>
+
+
+
+
+
+        <h3
+            class="text-2xl font-bold text-blue-900 mb-3">
+
+            Thiết lập mặc định
+
+        </h3>
+
+
+
+
+
+        <p
+            class="text-gray-500 leading-relaxed">
+
+            Bạn có muốn thiết lập địa chỉ này làm mặc định không?
+
+        </p>
+
+
+
+
+
+        <div class="flex justify-center gap-3 mt-8">
+
+            <button
+                onclick="toggleModal('defaultModal')"
+                class="px-6 py-3 rounded-2xl border border-gray-300 hover:bg-gray-100 transition">
+
+                Không
+
+            </button>
+
+
+
+
+
+            <button
+                onclick="submitDefaultForm()"
+                class="bg-blue-900 hover:bg-blue-800 transition text-white px-6 py-3 rounded-2xl font-bold">
+
+                Có
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+{{-- ===================================================== --}}
 {{-- MESSAGE MODAL --}}
 {{-- ===================================================== --}}
 @if(session('success') || session('error'))
@@ -648,6 +740,8 @@
 
     let currentDeleteId = null;
 
+    let currentDefaultId = null;
+
 
 
 
@@ -710,6 +804,38 @@
         document
             .getElementById(
                 `deleteForm${currentDeleteId}`
+            )
+            .submit();
+
+    }
+
+
+
+
+
+    // =====================================================
+    // OPEN DEFAULT MODAL
+    // =====================================================
+    function openDefaultModal(id) {
+
+        currentDefaultId = id;
+
+        toggleModal('defaultModal');
+
+    }
+
+
+
+
+
+    // =====================================================
+    // SUBMIT DEFAULT
+    // =====================================================
+    function submitDefaultForm() {
+
+        document
+            .getElementById(
+                `defaultForm${currentDefaultId}`
             )
             .submit();
 

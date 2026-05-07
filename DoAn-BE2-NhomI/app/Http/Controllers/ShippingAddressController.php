@@ -647,4 +647,60 @@ class ShippingAddressController extends Controller
 
     }
 
+    // =====================================================
+// SET DEFAULT ADDRESS
+// =====================================================
+    public function setDefault($id)
+    {
+
+        $address =
+            ShippingAddress::where(
+                'user_id',
+                Auth::id()
+            )
+
+                ->where(
+                    'address_id',
+                    $id
+                )
+
+                ->firstOrFail();
+
+
+
+
+
+        // bỏ mặc định cũ
+        ShippingAddress::where(
+            'user_id',
+            Auth::id()
+        )
+
+            ->update([
+                'is_default' => 0
+            ]);
+
+
+
+
+
+        // set mặc định mới
+        $address->update([
+            'is_default' => 1
+        ]);
+
+
+
+
+
+        return redirect()
+
+            ->route('addresses.index')
+
+            ->with(
+                'success',
+                'Thiết lập địa chỉ mặc định thành công.'
+            );
+
+    }
 }
