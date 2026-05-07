@@ -193,6 +193,7 @@ Route::middleware('auth')->group(function () {
         '/change-address/update/{id}',
         [ShippingAddressController::class, 'update']
     )->name('addresses.update');
+    
 });
 
 // CART
