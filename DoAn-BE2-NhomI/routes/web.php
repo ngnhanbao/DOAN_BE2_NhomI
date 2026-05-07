@@ -199,6 +199,12 @@ Route::middleware('auth')->group(function () {
         '/change-address/delete/{id}',
         [ShippingAddressController::class, 'destroy']
     )->name('addresses.destroy');
+
+    //thiết lập địa chỉ mặc định
+    Route::post(
+    '/change-address/default/{id}',
+    [ShippingAddressController::class, 'setDefault']
+)->name('addresses.default');
 });
 
 // CART
