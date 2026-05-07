@@ -141,7 +141,7 @@ Route::post('/password/change', [CrudUserController::class, 'changePassword'])->
 Route::get('/profile', [CrudUserController::class, 'profile'])
     ->middleware('auth')
     ->name('profile');
-
+    
 // update profile
 Route::post('/profile/update', [CrudUserController::class, 'updateProfile'])
     ->name('profile.update')
@@ -199,6 +199,12 @@ Route::middleware('auth')->group(function () {
         '/change-address/delete/{id}',
         [ShippingAddressController::class, 'destroy']
     )->name('addresses.destroy');
+
+    //thiết lập địa chỉ mặc định
+    Route::post(
+    '/change-address/default/{id}',
+    [ShippingAddressController::class, 'setDefault']
+)->name('addresses.default');
 });
 
 // CART
