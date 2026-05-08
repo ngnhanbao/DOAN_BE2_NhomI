@@ -17,7 +17,10 @@ class BackupController extends Controller
 {
     public function index()
     {
-        $backups = BackupLog::with('creator')->orderBy('created_at', 'desc')->get();
+        $backups = BackupLog::with('creator')
+            ->where('file_name', 'not like', 'undo_restore%')
+            ->orderBy('created_at', 'desc')
+            ->get();
         return view('admin.backups.index', compact('backups'));
     }
 
@@ -87,6 +90,17 @@ class BackupController extends Controller
     private function createAutoBackup($prefix = 'auto_backup')
     {
         try {
+            if ($prefix === 'undo_restore') {
+                $oldUndos = BackupLog::where('file_name', 'like', 'undo_restore%')->get();
+                foreach ($oldUndos as $old) {
+                    $oldPath = storage_path('app/' . $old->file_path);
+                    if (file_exists($oldPath)) {
+                        unlink($oldPath);
+                    }
+                    $old->delete();
+                }
+            }
+
             $fileName = $prefix . '_' . Carbon::now()->format('Ymd_His') . '.sql';
             $directory = storage_path('app/backups');
             if (!file_exists($directory)) {
@@ -161,6 +175,10 @@ class BackupController extends Controller
                 return redirect()->route('admin.backups.index')->with('error', 'Không tìm thấy file backup trên server.');
             }
 
+            // Đọc file SQL vào bộ nhớ TRƯỚC KHI tạo auto backup
+            // vì createAutoBackup('undo_restore') sẽ xoá các file undo cũ (có thể bao gồm file đang phục hồi)
+            $sql = file_get_contents($path);
+
             // Tự động sao lưu trước khi ghi đè
             $undoId = $this->createAutoBackup('undo_restore');
             $undoLogData = BackupLog::find($undoId);
@@ -168,7 +186,6 @@ class BackupController extends Controller
 
             $beforeCounts = $this->getTableCounts();
 
-            $sql = file_get_contents($path);
             DB::unprepared($sql);
 
             $afterCounts = $this->getTableCounts();
