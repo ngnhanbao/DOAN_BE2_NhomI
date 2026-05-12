@@ -786,7 +786,7 @@ float-slow glow-pulse"
                                 <div class="flex flex-col justify-center gap-3 min-w-[220px]">
 
                                     {{-- XEM CHI TIẾT --}}
-                                    <a href="#" class="relative overflow-hidden
+                                    <a href="{{ route('orders.detail', $order->order_id) }}" class="relative overflow-hidden
 shine-effect glow-pulse
 bg-gradient-to-r
 from-[#003366] to-[#0F5BCC]
