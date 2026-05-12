@@ -102,6 +102,9 @@ Route::middleware(['auth'])->group(function () {
 */
 Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
 
+    // Quản lý Sản phẩm (Products)
+    Route::resource('products', \App\Http\Controllers\Admin\ProductController::class);
+
     // Quản lý Danh mục (Categories)
     Route::resource('categories', CategoryController::class);
 
