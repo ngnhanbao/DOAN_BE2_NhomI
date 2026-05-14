@@ -95,92 +95,62 @@ body{
 
 <div class="max-w-7xl mx-auto py-10 px-5 fade-up">
 
-    <div class="grid lg:grid-cols-12 gap-8">
+    ```blade
+<div class="grid lg:grid-cols-12 gap-8 items-start">
 
-        {{-- SIDEBAR --}}
-        <div class="lg:col-span-3">
+    {{-- SIDEBAR --}}
+    <div class="lg:col-span-3">
 
-            <div class="glass-card rounded-3xl p-7 sticky top-24">
+        <div class="glass-card rounded-[32px] p-7 sticky top-24">
 
-                <h2 class="text-3xl font-black text-[#001e40]">
-                    Checkout
-                </h2>
+            <h2 class="text-3xl font-black text-[#001e40]">
+                Checkout
+            </h2>
 
-                <p class="text-gray-400 mt-2 text-sm">
-                    Hoàn tất đơn hàng của bạn
-                </p>
+            <p class="text-gray-400 mt-2 text-sm">
+                Hoàn tất đơn hàng của bạn
+            </p>
 
-                <div class="mt-10 space-y-5">
+            <div class="mt-10 space-y-5">
 
-                    {{-- STEP 1 --}}
-                    <a href="{{ route('checkout') }}"
-                       class="bg-white border border-gray-100
-                              rounded-3xl p-5 flex items-center gap-4">
+                {{-- STEP 1 --}}
+                <a href="{{ route('checkout') }}"
+                   class="sidebar-step bg-white rounded-3xl p-5 flex items-center gap-4 border border-gray-100 text-gray-400 block">
 
-                        <div
-                            class="w-14 h-14 rounded-2xl
-                                   bg-gray-50 shadow flex items-center
-                                   justify-center text-2xl">
+                    <div class="text-3xl">
+                        👤
+                    </div>
 
-                            📦
+                    <div>
 
-                        </div>
+                        <p class="uppercase tracking-[3px] text-xs font-black">
+                            Bước 1
+                        </p>
 
-                        <div>
+                        <p class="font-bold mt-1">
+                            Thông tin giao hàng
+                        </p>
 
-                            <p
-                                class="uppercase tracking-[3px]
-                                       text-xs font-black text-gray-400">
+                    </div>
 
-                                Bước 1
+                </a>
 
-                            </p>
+                {{-- STEP 2 --}}
+                <div class="sidebar-step bg-blue-50 border-l-4 border-[#001e40] rounded-3xl p-5 flex items-center gap-4">
 
-                            <p
-                                class="font-black text-gray-500
-                                       mt-1 text-lg">
+                    <div class="text-3xl">
+                        💳
+                    </div>
 
-                                Thông tin giao hàng
+                    <div>
 
-                            </p>
+                        <p class="uppercase tracking-[3px] text-xs font-black text-[#001e40]">
+                            Bước 2
+                        </p>
 
-                        </div>
-
-                    </a>
-
-                    {{-- STEP 2 --}}
-                    <div
-                        class="bg-blue-50 border-l-4 border-[#001e40]
-                               rounded-3xl p-5 flex items-center gap-4">
-
-                        <div
-                            class="w-14 h-14 rounded-2xl
-                                   bg-white shadow flex items-center
-                                   justify-center text-2xl">
-
-                            💳
-
-                        </div>
-
-                        <div>
-
-                            <p
-                                class="uppercase tracking-[3px]
-                                       text-xs font-black text-[#001e40]">
-
-                                Bước 2
-
-                            </p>
-
-                            <p
-                                class="font-black text-[#001e40]
-                                       mt-1 text-lg">
-
-                                Thanh toán
-
-                            </p>
-
-                        </div>
+                        <p class="font-bold text-[#001e40] mt-1">
+                            Thanh toán
+                        </p>
 
                     </div>
 
@@ -190,248 +160,289 @@ body{
 
         </div>
 
-        {{-- MAIN --}}
-        <div class="lg:col-span-6">
+    </div>
 
-            <div class="glass-card rounded-3xl p-8">
+    {{-- MAIN --}}
+    <div class="lg:col-span-5">
 
-                <h1 class="text-4xl font-black text-[#001e40] mb-2">
-                    PHƯƠNG THỨC THANH TOÁN
-                </h1>
+        <div class="glass-card rounded-[32px] p-8 fade-slide">
 
-                <p class="text-gray-400 mb-10">
-                    Chọn phương thức thanh toán phù hợp
-                </p>
+            <div class="flex items-center justify-between mb-10">
 
-                {{-- INFO --}}
-                <div class="bg-[#f8fbff] border border-[#dbe2ea] rounded-3xl p-6 mb-8">
+                <div>
 
-                    <h3 class="font-black text-[#001e40] text-xl mb-5">
-                        Thông tin nhận hàng
-                    </h3>
+                    <h1 class="text-4xl font-black text-[#001e40]">
+                        PHƯƠNG THỨC THANH TOÁN
+                    </h1>
 
-                    <div class="space-y-3 text-gray-600">
+                    <p class="text-gray-400 mt-2">
+                        Chọn phương thức thanh toán phù hợp
+                    </p>
 
-                        <p>
+                </div>
 
-                            <span class="font-bold">
-                                Họ tên:
-                            </span>
+                <div class="hidden md:flex w-16 h-16 rounded-2xl bg-blue-50 items-center justify-center text-3xl">
+                    💳
+                </div>
 
-                            {{ $info['full_name'] ?? '' }}
+            </div>
 
-                        </p>
+            {{-- INFO --}}
+            <div class="bg-[#f8fbff] border border-[#dbe2ea] rounded-[28px] p-6 mb-8">
 
-                        <p>
+                <h3 class="font-black text-[#001e40] text-xl mb-5">
+                    Thông tin nhận hàng
+                </h3>
 
-                            <span class="font-bold">
-                                Số điện thoại:
-                            </span>
+                <div class="space-y-3 text-gray-600 leading-7">
 
-                            {{ $info['phone'] ?? '' }}
+                    <p>
+                        <span class="font-bold">
+                            Họ tên:
+                        </span>
 
-                        </p>
+                        {{ $info['full_name'] ?? '' }}
+                    </p>
 
-                        <p>
+                    <p>
+                        <span class="font-bold">
+                            Số điện thoại:
+                        </span>
 
-                            <span class="font-bold">
-                                Địa chỉ:
-                            </span>
+                        {{ $info['phone'] ?? '' }}
+                    </p>
 
-                            @if(($info['address_type'] ?? '') == 'saved')
+                    <p>
 
-                                @php
+                        <span class="font-bold">
+                            Địa chỉ:
+                        </span>
 
-                                    $selectedAddress =
-                                        $addresses
-                                            ->where(
-                                                'address_id',
-                                                $info['shipping_address_id']
-                                            )
-                                            ->first();
+                        @if(($info['address_type'] ?? '') == 'saved')
 
-                                @endphp
+                            @php
 
-                                @if($selectedAddress)
+                                $selectedAddress =
+                                    $addresses
+                                        ->where(
+                                            'address_id',
+                                            $info['shipping_address_id']
+                                        )
+                                        ->first();
 
-                                    {{ $selectedAddress->street_address }},
-                                    {{ $selectedAddress->ward }},
-                                    {{ $selectedAddress->district }},
-                                    {{ $selectedAddress->province }}
+                            @endphp
 
-                                @endif
+                            @if($selectedAddress)
 
-                            @else
-
-                                {{ $info['street_address'] ?? '' }},
-                                {{ $info['ward'] ?? '' }},
-                                {{ $info['district'] ?? '' }},
-                                {{ $info['province'] ?? '' }}
+                                {{ $selectedAddress->street_address }},
+                                {{ $selectedAddress->ward }},
+                                {{ $selectedAddress->district }},
+                                {{ $selectedAddress->province }}
 
                             @endif
 
-                        </p>
+                        @else
 
-                    </div>
+                            {{ $info['street_address'] ?? '' }},
+                            {{ $info['ward'] ?? '' }},
+                            {{ $info['district'] ?? '' }},
+                            {{ $info['province'] ?? '' }}
+
+                        @endif
+
+                    </p>
 
                 </div>
 
-                {{-- FORM --}}
-                <form action="{{ route('checkout.store') }}"
-                      method="POST">
-
-                    @csrf
-
-                    <div class="space-y-5">
-
-                        {{-- COD --}}
-                        <label
-                            class="payment-card active rounded-3xl p-6 flex justify-between items-center"
-                            id="cod_card">
-
-                            <div class="flex items-center gap-5">
-
-                                <div class="text-4xl">
-                                    🚚
-                                </div>
-
-                                <div>
-
-                                    <h3 class="font-black text-xl text-[#001e40]">
-                                        Thanh toán COD
-                                    </h3>
-
-                                    <p class="text-sm text-gray-500 mt-2">
-                                        Thanh toán khi nhận hàng
-                                    </p>
-
-                                </div>
-
-                            </div>
-
-                            <input checked
-                                   type="radio"
-                                   name="payment_method"
-                                   value="cod"
-                                   onchange="changePayment()">
-
-                        </label>
-
-                        {{-- MOMO --}}
-                        <label
-                            class="payment-card rounded-3xl p-6 flex justify-between items-center"
-                            id="momo_card">
-
-                            <div class="flex items-center gap-5">
-
-                                <div class="text-4xl">
-                                    💗
-                                </div>
-
-                                <div>
-
-                                    <h3 class="font-black text-xl text-[#001e40]">
-                                        Thanh toán MoMo
-                                    </h3>
-
-                                    <p class="text-sm text-gray-500 mt-2">
-                                        Ví điện tử MoMo
-                                    </p>
-
-                                </div>
-
-                            </div>
-
-                            <input type="radio"
-                                   name="payment_method"
-                                   value="momo"
-                                   onchange="changePayment()">
-
-                        </label>
-
-                        {{-- VNPAY --}}
-                        <label
-                            class="payment-card rounded-3xl p-6 flex justify-between items-center"
-                            id="vnpay_card">
-
-                            <div class="flex items-center gap-5">
-
-                                <div class="text-4xl">
-                                    🏦
-                                </div>
-
-                                <div>
-
-                                    <h3 class="font-black text-xl text-[#001e40]">
-                                        Thanh toán VNPAY
-                                    </h3>
-
-                                    <p class="text-sm text-gray-500 mt-2">
-                                        Quét QR thanh toán
-                                    </p>
-
-                                </div>
-
-                            </div>
-
-                            <input type="radio"
-                                   name="payment_method"
-                                   value="vnpay"
-                                   onchange="changePayment()">
-
-                        </label>
-
-                    </div>
-
-                    {{-- BUTTON --}}
-                    <button type="submit"
-                            class="floating-button w-full mt-10 bg-[#001e40] text-white py-5 rounded-2xl font-black text-lg">
-
-                        ĐẶT HÀNG →
-
-                    </button>
-
-                </form>
-
             </div>
+
+            {{-- FORM --}}
+            <form action="{{ route('checkout.store') }}"
+                  method="POST">
+
+                @csrf
+
+                <div class="space-y-5">
+
+                    {{-- COD --}}
+                    <label
+                        class="payment-card active rounded-[28px] p-6 flex justify-between items-center"
+                        id="cod_card">
+
+                        <div class="flex items-center gap-5">
+
+                            <div class="text-4xl">
+                                🚚
+                            </div>
+
+                            <div>
+
+                                <h3 class="font-black text-xl text-[#001e40]">
+                                    Thanh toán COD
+                                </h3>
+
+                                <p class="text-sm text-gray-500 mt-2">
+                                    Thanh toán khi nhận hàng
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <input checked
+                               type="radio"
+                               name="payment_method"
+                               value="cod"
+                               onchange="changePayment()">
+
+                    </label>
+
+                    {{-- MOMO --}}
+                    <label
+                        class="payment-card rounded-[28px] p-6 flex justify-between items-center"
+                        id="momo_card">
+
+                        <div class="flex items-center gap-5">
+
+                            <div class="text-4xl">
+                                💗
+                            </div>
+
+                            <div>
+
+                                <h3 class="font-black text-xl text-[#001e40]">
+                                    Thanh toán MoMo
+                                </h3>
+
+                                <p class="text-sm text-gray-500 mt-2">
+                                    Ví điện tử MoMo
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <input type="radio"
+                               name="payment_method"
+                               value="momo"
+                               onchange="changePayment()">
+
+                    </label>
+
+                    {{-- VNPAY --}}
+                    <label
+                        class="payment-card rounded-[28px] p-6 flex justify-between items-center"
+                        id="vnpay_card">
+
+                        <div class="flex items-center gap-5">
+
+                            <div class="text-4xl">
+                                🏦
+                            </div>
+
+                            <div>
+
+                                <h3 class="font-black text-xl text-[#001e40]">
+                                    Thanh toán VNPAY
+                                </h3>
+
+                                <p class="text-sm text-gray-500 mt-2">
+                                    Quét QR thanh toán
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <input type="radio"
+                               name="payment_method"
+                               value="vnpay"
+                               onchange="changePayment()">
+
+                    </label>
+
+                </div>
+
+                <button type="submit"
+                        class="floating-button w-full mt-10 bg-[#001e40] text-white py-5 rounded-[22px] font-black text-lg">
+
+                    ĐẶT HÀNG →
+
+                </button>
+
+            </form>
 
         </div>
 
-        {{-- ORDER --}}
-        <div class="lg:col-span-3">
+    </div>
 
-            <div class="glass-card rounded-3xl p-8 sticky top-24">
+    {{-- RIGHT --}}
+    <div class="lg:col-span-4">
 
-                <h2 class="text-3xl font-black text-[#001e40] mb-8">
-                    ĐƠN HÀNG
-                </h2>
+        <div class="glass-card order-summary rounded-[32px] p-5 sticky top-24 fade-slide overflow-hidden">
+
+            {{-- HEADER --}}
+            <div class="flex items-center justify-between mb-6">
+
+                <div>
+
+                    <h2 class="text-[28px] font-black text-[#001e40] leading-none">
+                        ĐƠN HÀNG
+                    </h2>
+
+                    <p class="text-sm text-gray-400 mt-2 leading-6">
+                        Tổng quan sản phẩm thanh toán
+                    </p>
+
+                </div>
+
+                <div class="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center text-2xl flex-shrink-0">
+                    🛒
+                </div>
+
+            </div>
+
+            {{-- PRODUCTS --}}
+            <div class="space-y-4">
 
                 @foreach($checkoutItems as $item)
 
-                    <div class="cart-item flex gap-4 mb-6">
+                    <div class="border border-gray-100 rounded-[28px] p-4 bg-white overflow-hidden">
 
-                        <img src="{{ asset($item['image']) }}"
-                             class="w-24 h-24 object-cover rounded-2xl border">
+                        <div class="flex gap-4 items-center">
 
-                        <div class="flex-1">
+                            {{-- IMAGE --}}
+                            <div class="w-[90px] h-[90px] rounded-3xl overflow-hidden border bg-gray-50 flex-shrink-0">
 
-                            <h3 class="font-black text-[#001e40] leading-6">
+                                <img src="{{ asset($item['image']) }}"
+                                     class="w-full h-full object-cover">
 
-                                {{ $item['name'] }}
+                            </div>
 
-                            </h3>
+                            {{-- INFO --}}
+                            <div class="flex-1 min-w-0">
 
-                            <p class="text-gray-500 text-sm mt-1">
+                                <h3 class="font-black text-[#001e40] text-[16px] leading-7 break-words">
 
-                                x{{ $item['quantity'] }}
+                                    {{ $item['name'] }}
 
-                            </p>
+                                </h3>
 
-                            <p class="font-black text-xl text-[#001e40] mt-3">
+                                <div class="flex items-center justify-between gap-2 mt-4 flex-wrap">
 
-                                {{ number_format($item['price']) }}đ
+                                    <span class="bg-gray-100 text-gray-500 text-sm px-3 py-1 rounded-full flex-shrink-0">
+                                        x{{ $item['quantity'] }}
+                                    </span>
 
-                            </p>
+                                    <span class="font-black text-[#001e40] text-[16px] break-words text-right">
+
+                                        {{ number_format($item['price']) }}đ
+
+                                    </span>
+
+                                </div>
+
+                            </div>
 
                         </div>
 
@@ -439,50 +450,75 @@ body{
 
                 @endforeach
 
-                {{-- TOTAL --}}
-                <div class="border-t pt-6 mt-6 space-y-5">
+            </div>
 
-                    <div class="flex justify-between text-gray-500">
+            {{-- PRICE --}}
+            <div class="mt-7 border-t border-gray-200 pt-6 space-y-5">
 
-                        <span>Tạm tính</span>
+                <div class="flex items-center justify-between gap-3">
 
-                        <span>
-                            {{ number_format($subtotal) }}đ
-                        </span>
+                    <span class="text-gray-500 text-lg">
+                        Tạm tính
+                    </span>
+
+                    <span class="font-black text-[#001e40] text-[18px] text-right break-words">
+
+                        {{ number_format($subtotal) }}đ
+
+                    </span>
+
+                </div>
+
+                <div class="flex items-center justify-between gap-3">
+
+                    <span class="text-gray-500 text-lg">
+                        Phí vận chuyển
+                    </span>
+
+                    <span class="font-black text-[#001e40] text-[18px] text-right break-words">
+
+                        {{ number_format($shippingFee) }}đ
+
+                    </span>
+
+                </div>
+
+                <div class="flex items-center justify-between gap-3">
+
+                    <span class="text-gray-500 text-lg">
+                        Giảm giá
+                    </span>
+
+                    <span class="font-black text-red-500 text-[18px] text-right break-words">
+
+                        -{{ number_format($discount) }}đ
+
+                    </span>
+
+                </div>
+
+            </div>
+
+            {{-- TOTAL --}}
+            <div class="mt-7 bg-[#001e40] rounded-[30px] p-5 text-white overflow-hidden">
+
+                <div class="space-y-4">
+
+                    <div>
+
+                        <p class="uppercase tracking-[4px] text-[11px] text-blue-200">
+                            Tổng thanh toán
+                        </p>
+
+                        <p class="text-blue-100 text-sm mt-2 leading-6">
+                            Đã bao gồm VAT & phí vận chuyển
+                        </p>
 
                     </div>
 
-                    <div class="flex justify-between text-gray-500">
+                    <div class="text-[28px] md:text-[32px] font-black leading-tight break-words">
 
-                        <span>Phí ship</span>
-
-                        <span>
-                            {{ number_format($shippingFee) }}đ
-                        </span>
-
-                    </div>
-
-                    <div class="flex justify-between text-gray-500">
-
-                        <span>Giảm giá</span>
-
-                        <span>
-                            -{{ number_format($discount) }}đ
-                        </span>
-
-                    </div>
-
-                    <div class="border-t pt-5 flex justify-between items-center">
-
-                        <span class="text-xl font-black">
-                            Tổng tiền
-                        </span>
-
-                        <span class="text-3xl font-black text-[#001e40]">
-
-                            {{ number_format($total) }}đ
-
-                        </span>
+                        {{ number_format($total) }}đ
 
                     </div>
 
@@ -495,6 +531,8 @@ body{
     </div>
 
 </div>
+
+ </div>
 
 <script>
 
