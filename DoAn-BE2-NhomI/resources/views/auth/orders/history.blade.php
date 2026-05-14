@@ -128,6 +128,127 @@
 .bg-move {
     animation: moveGlow 12s ease-in-out infinite;
 }
+
+.success-modal{
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,.5);
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    z-index:9999;
+
+    animation:fadeIn .3s ease;
+}
+
+.success-box{
+
+    width:420px;
+
+    background:#fff;
+
+    border-radius:24px;
+
+    padding:40px;
+
+    text-align:center;
+
+    animation:zoomIn .3s ease;
+}
+
+.success-icon{
+
+    width:90px;
+
+    height:90px;
+
+    border-radius:50%;
+
+    background:#22c55e;
+
+    color:#fff;
+
+    margin:auto;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:40px;
+
+    margin-bottom:20px;
+}
+
+.success-box h2{
+
+    color:#001e40;
+
+    margin-bottom:16px;
+}
+
+.success-box p{
+
+    margin-bottom:10px;
+
+    color:#555;
+}
+
+.success-box button{
+
+    margin-top:20px;
+
+    border:none;
+
+    background:#001e40;
+
+    color:#fff;
+
+    padding:12px 30px;
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+    font-weight:700;
+}
+
+@keyframes fadeIn{
+
+    from{
+        opacity:0;
+    }
+
+    to{
+        opacity:1;
+    }
+}
+
+@keyframes zoomIn{
+
+    from{
+
+        transform:scale(.7);
+
+        opacity:0;
+    }
+
+    to{
+
+        transform:scale(1);
+
+        opacity:1;
+    }
+}
+
 </style>
     <main class="relative pt-10 pb-20 px-4 max-w-5xl mx-auto overflow-hidden">
 
@@ -846,35 +967,51 @@ transition-all duration-300
                                                     {{-- ĐANG GIAO --}}
                                     @elseif($order->order_status == 'shipped')
 
-                                                   <button class="group relative overflow-hidden
+                                                   <a
+    href="{{ route('orders.tracking', $order->order_id) }}"
+    class="group relative overflow-hidden
 
-border border-blue-500
-bg-blue-50/70 backdrop-blur-xl
+    border border-blue-500
+    bg-blue-50/70 backdrop-blur-xl
 
-active:scale-95
+    active:scale-95
 
-text-blue-600 px-8 py-3
-rounded-xl text-xs font-bold
+    text-blue-600 px-8 py-3
+    rounded-xl text-xs font-bold
 
-tracking-widest uppercase
+    tracking-widest uppercase
 
-hover:bg-gradient-to-r
-hover:from-blue-500
-hover:to-indigo-600
+    hover:bg-gradient-to-r
+    hover:from-blue-500
+    hover:to-indigo-600
 
-hover:text-white
+    hover:text-white
 
-hover:-translate-y-1
-hover:scale-[1.02]
+    hover:-translate-y-1
+    hover:scale-[1.02]
 
-hover:shadow-[0_15px_40px_rgba(59,130,246,.35)]
+    hover:shadow-[0_15px_40px_rgba(59,130,246,.35)]
 
-transition-all duration-500">
+    transition-all duration-500">
 
-                                                        Theo dõi đơn hàng
+    <div
+        class="absolute inset-0
+        -translate-x-full
+        group-hover:translate-x-full
 
-                                                    </button>
+        bg-gradient-to-r
+        from-transparent
+        via-white/30
+        to-transparent
 
+        transition duration-1000">
+    </div>
+
+    <span class="relative z-10">
+        Theo dõi đơn hàng
+    </span>
+
+</a>
 
 
 
@@ -1103,5 +1240,53 @@ transition-all duration-500">
         </div>
 
     </main>
+@if(session('success_order'))
 
+<div id="successModal" class="success-modal">
+
+    <div class="success-box">
+
+        <div class="success-icon">
+            ✔
+        </div>
+
+        <h2>
+            Đặt hàng thành công
+        </h2>
+
+        <p>
+            Mã đơn:
+            <b>
+                {{ session('success_order.code') }}
+            </b>
+        </p>
+
+        <p>
+            Tổng tiền:
+            <b>
+                {{ number_format(session('success_order.total')) }}đ
+            </b>
+        </p>
+
+        <button onclick="closeSuccessModal()">
+            OK
+        </button>
+
+    </div>
+
+</div>
+
+@endif
+<script>
+
+function closeSuccessModal(){
+
+    document
+        .getElementById(
+            'successModal'
+        )
+        .style.display = 'none';
+}
+
+</script>
 @endsection
