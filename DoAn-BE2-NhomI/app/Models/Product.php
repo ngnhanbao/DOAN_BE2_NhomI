@@ -70,8 +70,15 @@ class Product extends Model
         return $this->hasMany(ProductVariant::class, 'product_id', 'product_id');
     }
 
+
     public function reviews()
     {
         return $this->hasMany(Review::class, 'product_id', 'product_id');
     }
+
+    // 🔥 1 sản phẩm có nhiều đánh giá
+    public function reviews() {
+    return $this->hasMany(ProductReview::class, 'product_id', 'product_id');
+}
+>>>>>>> fix-crud-user-controller
 }
