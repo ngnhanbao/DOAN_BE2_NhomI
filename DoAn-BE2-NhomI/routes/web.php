@@ -14,6 +14,7 @@ use App\Http\Controllers\OTPController;
 use App\Http\Controllers\ShippingAddressController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\Admin\AttributeController;
 
 
 /*
@@ -21,6 +22,7 @@ use App\Http\Controllers\OrderController;
 | PUBLIC ROUTES (Trang chủ & Sản phẩm)
 |--------------------------------------------------------------------------
 */
+
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/search-ajax', [ProductController::class, 'searchAjax'])->name('search.ajax');
 Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.show');
@@ -103,6 +105,9 @@ Route::middleware(['auth'])->group(function () {
 */
 Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
 
+    // Quản lý Sản phẩm (Products)
+    Route::resource('products', \App\Http\Controllers\Admin\ProductController::class);
+
     // Quản lý Danh mục (Categories)
     Route::resource('categories', CategoryController::class);
 
@@ -129,6 +134,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::post('backups/{id}/restore', [App\Http\Controllers\Admin\BackupController::class, 'restore'])->name('backups.restore');
     Route::delete('backups/{id}', [App\Http\Controllers\Admin\BackupController::class, 'destroy'])->name('backups.destroy');
 
+    // Quản lý Thuộc tính (Attributes)
+    Route::resource('attributes', AttributeController::class);
 });
 
 
@@ -142,7 +149,7 @@ Route::post('/password/change', [CrudUserController::class, 'changePassword'])->
 Route::get('/profile', [CrudUserController::class, 'profile'])
     ->middleware('auth')
     ->name('profile');
-    
+
 // update profile
 Route::post('/profile/update', [CrudUserController::class, 'updateProfile'])
     ->name('profile.update')
@@ -203,9 +210,9 @@ Route::middleware('auth')->group(function () {
 
     //thiết lập địa chỉ mặc định
     Route::post(
-    '/change-address/default/{id}',
-    [ShippingAddressController::class, 'setDefault']
-)->name('addresses.default');
+        '/change-address/default/{id}',
+        [ShippingAddressController::class, 'setDefault']
+    )->name('addresses.default');
 });
 
 // CART
@@ -213,6 +220,8 @@ Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
 Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
 Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
+Route::post('/cart/select', [CartController::class, 'select'])->name('cart.select');
+Route::post('/cart/toggle-select', [CartController::class, 'toggleSelect'])->name('cart.toggleSelect');
 
 // Phải có dấu {id} trong ngoặc nhọn
 Route::get('/api/compare-product/{id}', [App\Http\Controllers\CompareController::class, 'getCompareProduct']);
@@ -224,3 +233,67 @@ Route::get('/orders', [OrderController::class, 'history'])
 // xem chi tiet don hang
 Route::get('/orders/{id}', [OrderController::class, 'detail'])
     ->name('orders.detail');
+<<<<<<< HEAD
+
+
+/*
+|--------------------------------------------------------------------------
+| CHECKOUT
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware('auth')->group(function () {
+
+    /*
+    |--------------------------------------------------------------------------
+    | STEP 1
+    |--------------------------------------------------------------------------
+    */
+    Route::get(
+        '/checkout',
+        [OrderController::class, 'checkout']
+    )->name('checkout');
+
+    /*
+    |--------------------------------------------------------------------------
+    | SAVE INFORMATION
+    |--------------------------------------------------------------------------
+    */
+    Route::post(
+        '/checkout/save-information',
+        [OrderController::class, 'saveInformation']
+    )->name('checkout.saveInformation');
+
+    /*
+    |--------------------------------------------------------------------------
+    | STEP 2
+    |--------------------------------------------------------------------------
+    */
+    Route::get(
+        '/checkout/payment',
+        [OrderController::class, 'payment']
+    )->name('checkout.payment');
+
+    /*
+    |--------------------------------------------------------------------------
+    | STORE ORDER
+    |--------------------------------------------------------------------------
+    */
+    Route::post(
+        '/checkout/store',
+        [OrderController::class, 'store']
+    )->name('checkout.store');
+
+ 
+    /*
+    |--------------------------------------------------------------------------
+    | HISTORY
+    |--------------------------------------------------------------------------
+    */
+    Route::get(
+        '/history',
+        [OrderController::class, 'history']
+    )->name('order.history');
+});
+=======
+>>>>>>> master
