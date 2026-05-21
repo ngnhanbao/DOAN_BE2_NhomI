@@ -935,7 +935,7 @@ class OrderController extends Controller
             . "?amount=" . $amount
             . "&addInfo=" . $content
             . "&accountName=" . urlencode($accountName);
-<<<<<<< HEAD
+
         $checkoutItems = session()->get(
             'checkout_items',
             []
@@ -969,32 +969,31 @@ class OrderController extends Controller
         | RETURN VIEW
         |--------------------------------------------------------------------------
         */
-       return view(
+        return view(
 
-    'checkout.vnpay',
+            'checkout.vnpay',
 
-    compact(
+            compact(
 
-        'amount',
+                'amount',
 
-        'orderCode',
+                'orderCode',
 
-        'qr',
+                'qr',
 
-        'request',
+                'request',
 
-        'checkoutItems',
+                'checkoutItems',
 
-        'subtotal',
+                'subtotal',
 
-        'shippingFee',
+                'shippingFee',
 
-        'discount',
+                'discount',
 
-        'total'
-    )
-);
-=======
+                'total'
+            )
+        );
 
         return view(
             'checkout.vnpay',
@@ -1005,7 +1004,7 @@ class OrderController extends Controller
                 'request'
             )
         );
->>>>>>> master
+
     }
 
     /**
