@@ -292,27 +292,45 @@ class ProductController extends Controller
                                           ->where('product_id', $product->product_id)
                                           ->get();
             foreach ($imagesToDelete as $img) {
-                // Lấy đường dẫn tương đối để xóa khỏi disk
-                $path = str_replace('/storage/', '', $img->image_url);
-                if (\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
-                    \Illuminate\Support\Facades\Storage::disk('public')->delete($path);
+                if (str_starts_with($img->image_url, '/products/')) {
+                    $fullPath = public_path(ltrim($img->image_url, '/'));
+                    if (file_exists($fullPath)) {
+                        @unlink($fullPath);
+                    }
+                } else {
+                    $path = str_replace('/storage/', '', $img->image_url);
+                    if (\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
+                        \Illuminate\Support\Facades\Storage::disk('public')->delete($path);
+                    }
                 }
                 $img->delete();
             }
         }
 
+        // Cập nhật ảnh chính từ ảnh có sẵn được chọn
+        if ($request->filled('primary_image_id')) {
+            ProductImage::where('product_id', $product->product_id)->update(['is_primary' => 0]);
+            ProductImage::where('image_id', $request->primary_image_id)
+                        ->where('product_id', $product->product_id)
+                        ->update(['is_primary' => 1]);
+        }
+
         // Lưu ảnh upload từ thiết bị
         if ($request->hasFile('upload_images')) {
             $order = $product->images()->max('sort_order') ?? 0;
-            $directory = 'products/' . $product->product_id;
+            $directory = public_path('products/' . $product->product_id);
+            
+            if (!file_exists($directory)) {
+                mkdir($directory, 0755, true);
+            }
             
             foreach ($request->file('upload_images') as $file) {
                 $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-                $path = $file->storeAs($directory, $fileName, 'public');
+                $file->move($directory, $fileName);
                 
                 ProductImage::create([
                     'product_id' => $product->product_id,
-                    'image_url'  => \Illuminate\Support\Facades\Storage::url($path),
+                    'image_url'  => '/products/' . $product->product_id . '/' . $fileName,
                     'sort_order' => ++$order,
                     'is_primary' => ($order === 1) ? 1 : 0,
                 ]);

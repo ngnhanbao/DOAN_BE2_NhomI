@@ -149,8 +149,13 @@
                                 <img src="{{ $img->image_url }}" alt="" class="w-full h-full object-contain p-1"
                                      onerror="this.style.display='none'">
                                 @if($img->is_primary)
-                                    <div class="absolute top-1 left-1 px-1.5 py-0.5 bg-blue-600 text-white text-[8px] font-black rounded">CHÍNH</div>
+                                    <div class="absolute top-1 left-1 px-1.5 py-0.5 bg-blue-600 text-white text-[8px] font-black rounded shadow">CHÍNH</div>
                                 @endif
+                                <!-- Chọn làm ảnh chính -->
+                                <label class="absolute bottom-1 left-1 bg-white/90 px-1.5 py-1 rounded shadow cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 border border-blue-100">
+                                    <input type="radio" name="primary_image_id" value="{{ $img->image_id }}" {{ $img->is_primary ? 'checked' : '' }} class="w-3 h-3 text-blue-600 border-gray-300 focus:ring-blue-500">
+                                    <span class="text-[8px] font-black text-blue-600 uppercase">Chính</span>
+                                </label>
                                 <!-- Tùy chọn xóa ảnh -->
                                 <label class="absolute bottom-1 right-1 bg-white/90 px-1.5 py-1 rounded shadow cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 border border-red-100">
                                     <input type="checkbox" name="delete_images[]" value="{{ $img->image_id }}" class="w-3 h-3 text-red-500 rounded border-gray-300">

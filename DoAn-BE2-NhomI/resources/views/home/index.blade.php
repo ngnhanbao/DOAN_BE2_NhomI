@@ -35,7 +35,7 @@
                                 <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/10 hover:bg-white/20 hover:border-white/30 transition-all duration-300 flex flex-col flex-1 group h-full w-full">
                                     <div class="relative h-40 md:h-52 mb-4 bg-white/5 rounded-lg flex items-center justify-center p-2">
                                         <img alt="{{ $product->name }}" class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
-                                            src="{{ asset(str_replace('public/', '', $product->image_url)) }}" />
+                                            src="{{ asset(str_replace(['public/', '/storage/products/'], ['', '/products/'], $product->image_url)) }}" />
 
                                         <span class="absolute top-0 left-0 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[10px] font-black w-7 h-7 rounded-full flex items-center justify-center shadow-lg">
                                             #{{ $index + 1 }}
@@ -96,7 +96,7 @@
                 <div class="relative rounded-2xl overflow-hidden aspect-[4/5] shadow-2xl group bg-brand-blue">
                     @if(isset($promoProduct))
                     <img alt="{{ $promoProduct->name }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 opacity-80"
-                        src="{{ asset(str_replace('public/', '', $promoProduct->image_url)) }}" />
+                        src="{{ asset(str_replace(['public/', '/storage/products/'], ['', '/products/'], $promoProduct->image_url)) }}" />
                     <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-8 text-white">
                         <span class="bg-red-600 w-fit px-3 py-1 rounded-full text-[10px] font-bold mb-3 uppercase tracking-widest">Hot Deal</span>
                         <h3 class="text-2xl font-bold mb-2 leading-tight">{{ $promoProduct->name }}</h3>
@@ -117,7 +117,7 @@
                 <div class="group bg-white rounded-2xl p-4 border border-slate-100 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
                     <a href="{{ url('/product/' . $product->product_id) }}" class="relative aspect-square mb-4 block overflow-hidden rounded-xl">
                         <img alt="{{ $product->name }}" class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
-                            src="{{ asset(str_replace('public/', '', $product->image_url)) }}" />
+                            src="{{ asset(str_replace(['public/', '/storage/products/'], ['', '/products/'], $product->image_url)) }}" />
                         <div class="absolute top-2 left-2 flex flex-col gap-1">
                             @if(isset($product->created_at) && \Carbon\Carbon::parse($product->created_at)->diffInDays(now()) <= 7)
                                 <span class="bg-emerald-500 text-white text-[9px] font-bold px-2 py-1 rounded-lg">NEW</span>

@@ -18,7 +18,7 @@
             {{-- ===== ẢNH SẢN PHẨM ===== --}}
             <div class="lg:col-span-6 sticky top-24">
                 <div class="border-2 border-gray-50 p-8 rounded-3xl bg-white shadow-sm hover:shadow-md transition-shadow">
-                    <img src="{{ asset(str_replace('public/', '', $product->image_url)) }}"
+                    <img src="{{ asset(str_replace(['public/', '/storage/products/'], ['', '/products/'], $product->image_url)) }}"
                          class="w-full h-[450px] object-contain hover:scale-105 transition-transform duration-500"
                          alt="{{ $product->name }}">
                 </div>
@@ -155,7 +155,7 @@
                 </div>
                 <div class="flex flex-col border-r text-center">
                     <div class="h-44 p-6 flex flex-col items-center justify-end border-b">
-                        <img src="{{ asset(str_replace('public/', '', $product->image_url)) }}" class="h-24 object-contain mb-2" />
+                        <img src="{{ asset(str_replace(['public/', '/storage/products/'], ['', '/products/'], $product->image_url)) }}" class="h-24 object-contain mb-2" />
                         <span class="text-sm font-black text-blue-900">{{ $product->name }}</span>
                     </div>
                     <div class="flex-1 text-sm font-bold text-blue-900">
@@ -199,7 +199,7 @@
                     @foreach($relatedProducts as $item)
                         <a href="{{ url('/product/' . $item->product_id) }}" class="group border border-gray-100 rounded-2xl p-4 hover:shadow-2xl hover:-translate-y-1 transition-all bg-white flex flex-col">
                             <div class="aspect-square mb-4 overflow-hidden rounded-xl">
-                                <img src="{{ asset(str_replace('public/', '', $item->image_url)) }}" 
+                                <img src="{{ asset(str_replace(['public/', '/storage/products/'], ['', '/products/'], $item->image_url)) }}" 
                                      class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500" 
                                      alt="{{ $item->name }}">
                             </div>
