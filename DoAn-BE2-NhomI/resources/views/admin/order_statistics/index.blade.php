@@ -35,8 +35,7 @@ $statusOptions = [
 'pending' => 'Chờ xác nhận',
 'confirmed' => 'Đã xác nhận',
 'processing' => 'Đang xử lý',
-'shipping' => 'Đang giao',
-'completed' => 'Hoàn thành',
+'shipped' => 'Đang giao',
 'delivered' => 'Đã giao',
 'cancelled' => 'Đã hủy',
 ];
@@ -56,6 +55,11 @@ $statusMap = [
 'text' => 'Đang xử lý',
 'class' => 'bg-blue-100 text-blue-700',
 'dot' => 'bg-blue-500',
+],
+'shipped' => [
+'text' => 'Đang giao',
+'class' => 'bg-indigo-100 text-indigo-700',
+'dot' => 'bg-indigo-500',
 ],
 'shipping' => [
 'text' => 'Đang giao',
@@ -343,17 +347,26 @@ $paymentMethodMap = [
 
                         <td class="px-6 py-4">
                             <div class="flex items-center justify-center gap-2">
-                                <button class="p-1.5 text-[#003366] hover:bg-[#003366]/10 rounded transition-colors" title="Xem đơn">
+                                <a href="{{ route('orders.invoice', $order->order_id) }}" target="_blank" class="p-1.5 text-[#003366] hover:bg-[#003366]/10 rounded transition-colors block" title="Xem đơn">
                                     <i data-lucide="eye" class="w-5 h-5"></i>
-                                </button>
+                                </a>
 
-                                <button class="p-1.5 text-[#003366] hover:bg-[#003366]/10 rounded transition-colors" title="Sửa đơn">
+                                <a href="{{ route('admin.orders.edit', $order->order_id) }}" class="p-1.5 text-[#003366] hover:bg-[#003366]/10 rounded transition-colors block" title="Sửa đơn">
                                     <i data-lucide="edit" class="w-5 h-5"></i>
-                                </button>
+                                </a>
 
-                                <button class="p-1.5 text-[#003366] hover:bg-[#003366]/10 rounded transition-colors" title="Xác nhận">
-                                    <i data-lucide="check-circle" class="w-5 h-5"></i>
-                                </button>
+                                @if($order->order_status === 'pending')
+                                    <form action="{{ route('admin.orders.confirm', $order->order_id) }}" method="POST" class="inline m-0">
+                                        @csrf
+                                        <button type="submit" class="p-1.5 text-[#003366] hover:bg-green-50 hover:text-green-600 rounded transition-colors block" title="Xác nhận đơn hàng" onclick="return confirm('Bạn có chắc chắn muốn duyệt nhanh đơn hàng này?')">
+                                            <i data-lucide="check-circle" class="w-5 h-5"></i>
+                                        </button>
+                                    </form>
+                                @else
+                                    <button class="p-1.5 text-gray-300 cursor-not-allowed rounded" title="Đã duyệt / Không thể xác nhận" disabled>
+                                        <i data-lucide="check-circle" class="w-5 h-5"></i>
+                                    </button>
+                                @endif
                             </div>
                         </td>
                     </tr>

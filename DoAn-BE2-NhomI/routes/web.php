@@ -189,6 +189,15 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::get('orders/search-user', [OrderStatisticController::class, 'searchUser'])
         ->name('orders.search-user');
 
+    Route::get('orders/{id}/edit', [OrderStatisticController::class, 'edit'])
+        ->name('orders.edit');
+
+    Route::patch('orders/{id}/update', [OrderStatisticController::class, 'update'])
+        ->name('orders.update');
+
+    Route::post('orders/{id}/confirm', [OrderStatisticController::class, 'confirm'])
+        ->name('orders.confirm');
+
     //Báo cáo doanh thu
     // Route::get('/admin/revenue-reports', [RevenueReportController::class, 'index'])
     //     ->name('admin.revenue_reports.index');

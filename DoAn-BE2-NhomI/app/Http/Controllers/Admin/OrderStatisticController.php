@@ -24,7 +24,7 @@ class OrderStatisticController extends Controller
             ->count();
 
         $completedOrders = DB::table('orders')
-            ->whereIn('order_status', ['completed', 'delivered'])
+            ->whereIn('order_status', ['delivered'])
             ->count();
 
         $cancelledOrders = DB::table('orders')
@@ -32,12 +32,12 @@ class OrderStatisticController extends Controller
             ->count();
 
         $totalRevenue = DB::table('orders')
-            ->whereIn('order_status', ['completed', 'delivered', 'shipping', 'processing'])
+            ->whereIn('order_status', ['delivered', 'shipped', 'processing'])
             ->sum('total_amount');
 
         $todayRevenue = DB::table('orders')
             ->whereDate('created_at', today())
-            ->whereIn('order_status', ['completed', 'delivered', 'shipping', 'processing'])
+            ->whereIn('order_status', ['delivered', 'shipped', 'processing'])
             ->sum('total_amount');
 
         $todayNewOrders = DB::table('orders')
@@ -171,7 +171,7 @@ class OrderStatisticController extends Controller
             'delivery_type' => 'required|in:home,store',
             'payment_method' => 'required|in:cod,vnpay,momo',
             'payment_status' => 'required|in:pending,paid,refunded',
-            'order_status' => 'required|in:pending,confirmed,processing,shipping,completed,delivered,cancelled',
+            'order_status' => 'required|in:pending,confirmed,processing,shipped,delivered,cancelled',
             'items' => 'required|array|min:1',
             'items.*.variant_id' => 'required|integer',
             'items.*.quantity' => 'required|integer|min:1',
@@ -316,6 +316,131 @@ class OrderStatisticController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             return back()->withInput()->with('error', $e->getMessage());
+        }
+    }
+
+    public function edit($id)
+    {
+        $order = \App\Models\Order::with(['items.variant.product', 'shippingAddress', 'user'])->find($id);
+        if (!$order) {
+            return redirect()
+                ->route('admin.order-statistics.index')
+                ->with('error', 'Đơn hàng không tồn tại!');
+        }
+
+        return view('admin.order_statistics.edit', compact('order'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'order_status' => 'required|in:pending,confirmed,processing,shipped,delivered,cancelled',
+            'payment_status' => 'required|in:pending,paid,refunded',
+            'cancel_reason' => 'nullable|string|max:500',
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            $order = \App\Models\Order::with('items')->findOrFail($id);
+            $oldStatus = $order->order_status;
+            $newStatus = $request->order_status;
+
+            $oldPaymentStatus = $order->payment_status;
+            $newPaymentStatus = $request->payment_status;
+
+            // 1. Xử lý hoàn kho khi hủy đơn hoặc trừ kho khi khôi phục đơn
+            if ($newStatus == 'cancelled' && $oldStatus != 'cancelled') {
+                // Hoàn kho
+                foreach ($order->items as $item) {
+                    \App\Models\ProductVariant::where('variant_id', $item->variant_id)
+                        ->increment('stock_quantity', $item->quantity);
+                }
+            } elseif ($oldStatus == 'cancelled' && $newStatus != 'cancelled') {
+                // Khôi phục đơn từ đã hủy -> kiểm tra tồn kho trước khi trừ
+                foreach ($order->items as $item) {
+                    $variant = \App\Models\ProductVariant::find($item->variant_id);
+                    if (!$variant || $variant->stock_quantity < $item->quantity) {
+                        throw new \Exception("Không thể khôi phục đơn hàng vì biến thể sản phẩm [ID: {$item->variant_id}] không đủ tồn kho!");
+                    }
+                }
+                // Trừ kho
+                foreach ($order->items as $item) {
+                    \App\Models\ProductVariant::where('variant_id', $item->variant_id)
+                        ->decrement('stock_quantity', $item->quantity);
+                }
+            }
+
+            // 2. Cập nhật trạng thái thanh toán và paid_at
+            $paidAt = $order->paid_at;
+            if ($newPaymentStatus == 'paid' && $oldPaymentStatus != 'paid') {
+                $paidAt = now();
+                // Cập nhật hoặc tạo mới bản ghi payment
+                \App\Models\Payment::updateOrCreate(
+                    ['order_id' => $order->order_id],
+                    [
+                        'status' => 'success',
+                        'paid_at' => $paidAt,
+                        'amount' => $order->total_amount,
+                        'gateway' => $order->payment_method ?: 'cod',
+                        'transaction_id' => 'ADM-UPD-' . strtoupper($order->payment_method ?: 'cod') . '-' . time()
+                    ]
+                );
+            } elseif ($newPaymentStatus != 'paid' && $oldPaymentStatus == 'paid') {
+                $paidAt = null;
+                \App\Models\Payment::where('order_id', $order->order_id)
+                    ->update([
+                        'status' => 'pending',
+                        'paid_at' => null
+                    ]);
+            }
+
+            // 3. Lưu thông tin đơn hàng
+            $order->update([
+                'order_status' => $newStatus,
+                'payment_status' => $newPaymentStatus,
+                'cancel_reason' => $newStatus == 'cancelled' ? $request->cancel_reason : null,
+                'paid_at' => $paidAt,
+            ]);
+
+            DB::commit();
+
+            return redirect()
+                ->route('admin.order-statistics.index')
+                ->with('success', "Đơn hàng #{$order->order_code} đã được cập nhật thành công!");
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->withInput()->with('error', $e->getMessage());
+        }
+    }
+
+    public function confirm($id)
+    {
+        DB::beginTransaction();
+        try {
+            $order = \App\Models\Order::findOrFail($id);
+            if ($order->order_status !== 'pending') {
+                return redirect()
+                    ->route('admin.order-statistics.index')
+                    ->with('error', 'Chỉ có thể xác nhận đơn hàng đang ở trạng thái Chờ xác nhận!');
+            }
+
+            $order->update([
+                'order_status' => 'confirmed'
+            ]);
+
+            DB::commit();
+
+            return redirect()
+                ->route('admin.order-statistics.index')
+                ->with('success', "Đơn hàng #{$order->order_code} đã được xác nhận thành công!");
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            return redirect()
+                ->route('admin.order-statistics.index')
+                ->with('error', 'Lỗi xác nhận đơn hàng: ' . $e->getMessage());
         }
     }
 }
