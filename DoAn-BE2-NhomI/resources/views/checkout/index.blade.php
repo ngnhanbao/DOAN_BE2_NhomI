@@ -347,7 +347,7 @@
         == 'saved'
         ? 'checked'
         : ''
-                   }} onchange="toggleAddressType()">
+                                               }} onchange="toggleAddressType()">
 
                                     <div>
 
@@ -372,7 +372,7 @@
         == 'new'
         ? 'checked'
         : ''
-               }} onchange="toggleAddressType()">
+                                           }} onchange="toggleAddressType()">
 
                                     <div>
 
@@ -410,7 +410,7 @@
 
                                 ? 'checked'
                                 : ''
-                                                                                                               }}>
+                                                                                                                                                                                                                                                                   }}>
 
                                                     <div class="flex-1 min-w-0">
 
@@ -556,7 +556,43 @@
                             <p class="text-sm text-gray-400 mt-2">
                                 Tổng quan sản phẩm thanh toán
                             </p>
+                            {{-- SUCCESS MESSAGE --}}
+                            @if(session('success'))
 
+                                        <div class="mt-4
+                                bg-green-50
+                                border
+                                border-green-200
+                                text-green-700
+                                rounded-2xl
+                                px-4
+                                py-3
+                                font-semibold">
+
+                                            {{ session('success') }}
+
+                                        </div>
+
+                            @endif
+
+                            {{-- ERROR MESSAGE --}}
+                            @if(session('error'))
+
+                                        <div class="mt-4
+                                bg-red-50
+                                border
+                                border-red-200
+                                text-red-700
+                                rounded-2xl
+                                px-4
+                                py-3
+                                font-semibold">
+
+                                            {{ session('error') }}
+
+                                        </div>
+
+                            @endif
                         </div>
 
                         <div class="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center text-2xl">
@@ -656,7 +692,7 @@
                             </span>
 
                         </div>
- <div class="flex items-center justify-between gap-3">
+                        <div class="flex items-center justify-between gap-3">
 
                             <span class="text-gray-500 text-lg">
                                 VAT (10%)
@@ -669,8 +705,537 @@
                             </span>
 
                         </div>
+                        <div class="flex justify-between items-start">
+
+    <div>
+
+        <div
+            class="text-gray-500">
+
+            Giảm giá
+
+        </div>
+
+        @if(count(session('discount_details', [])) > 0)
+
+            <div
+                class="mt-2
+                    space-y-1">
+
+                @foreach(session('discount_details',[]) as $item)
+
+                    <div
+                        class="flex
+                            items-center
+                            justify-between
+                            gap-4
+                            text-sm">
+
+                        <span
+                            class="text-gray-400">
+
+                            {{ $item['code'] }}
+
+                        </span>
+
+                        <span
+                            class="text-red-400">
+
+                            -{{ number_format($item['amount']) }}đ
+
+                        </span>
+
                     </div>
 
+                @endforeach
+
+            </div>
+
+        @endif
+
+    </div>
+
+    <div
+        class="text-red-500
+            font-bold">
+
+        -{{ number_format($discount) }}đ
+
+    </div>
+
+</div>
+                    </div>
+                    {{-- VOUCHER --}}
+                    <div class="mt-6">
+
+                        <div class="w-full
+                    bg-white
+                    border
+                    border-gray-200
+                    rounded-[28px]
+                    p-5">
+
+                            {{-- TOP --}}
+                            <div class="flex
+                        items-start
+                        justify-between
+                        gap-4">
+
+                                <div>
+
+                                    <h3 class="font-black
+                                text-[#001e40]
+                                text-lg">
+
+                                        Voucher giảm giá
+
+                                    </h3>
+
+                                    <p class="text-sm
+                                text-gray-400
+                                mt-1">
+
+                                        Tối đa 3 mã • mỗi loại 1 mã
+
+                                    </p>
+
+                                </div>
+
+                                <button type="button" onclick="openVoucherModal()" class="text-[#001e40]
+                            font-bold
+                            whitespace-nowrap">
+
+                                    Chọn >
+
+                                </button>
+
+                            </div>
+
+                            {{-- APPLIED --}}
+                            @if(count(session('applied_coupons', [])) > 0)
+
+                                <div class="flex
+                                flex-wrap
+                                gap-2
+                                mt-4">
+
+                                    @foreach(session('applied_coupons', []) as $coupon)
+
+                                        <div class="bg-green-100
+                                            text-green-700
+                                            px-3
+                                            py-2
+                                            rounded-full
+                                            text-sm
+                                            font-bold
+                                            flex
+                                            items-center
+                                            gap-2">
+
+                                            <span>
+
+                                                {{ $coupon['code'] }}
+
+                                            </span>
+
+                                            <form onclick="event.stopPropagation()" action="{{ route('checkout.removeVoucher') }}"
+                                                method="POST">
+
+                                                @csrf
+
+                                                <input type="hidden" name="code" value="{{ $coupon['code'] }}">
+
+                                                <button type="submit" class="text-red-500
+                                                    hover:text-red-700">
+
+                                                    ✕
+
+                                                </button>
+
+                                            </form>
+
+                                        </div>
+
+                                    @endforeach
+
+                                </div>
+
+                            @endif
+
+                        </div>
+
+                    </div>
+                    {{-- ================= MODAL ================= --}}
+                    <div id="voucherModal" class="fixed inset-0
+                bg-black/40
+                hidden
+                items-center
+                justify-center
+                z-50">
+
+                        <div class="bg-white
+                    w-[720px]
+                    max-w-[95%]
+                    rounded-3xl
+                    overflow-hidden">
+
+                            {{-- HEADER --}}
+                            <div class="border-b
+                        px-6
+                        py-5
+                        flex
+                        items-center
+                        justify-between">
+
+                                <h2 class="text-3xl
+                            font-black">
+
+                                    Chọn Voucher
+
+                                </h2>
+
+                                <button type="submit" class="w-5
+                h-5
+                flex
+                items-center
+                justify-center
+                text-red-500
+                hover:text-red-700
+                hover:bg-red-100
+                rounded-full
+                transition
+                font-black
+                leading-none">
+
+                                    ×
+
+                                </button>
+
+                            </div>
+
+                            {{-- BODY --}}
+                            <div class="p-6
+                        max-h-[600px]
+                        overflow-y-auto
+                        space-y-10">
+
+                                {{-- ================= SHIPPING ================= --}}
+                                <div>
+
+                                    <h3 class="font-black
+                                text-xl
+                                mb-4">
+
+                                        Mã miễn phí vận chuyển
+
+                                    </h3>
+
+                                    <div class="space-y-4">
+
+                                        @foreach($shippingVouchers as $index => $voucher)
+
+                                                                            <div class="
+                                                                            shipping-item
+                                                                            {{
+                                                $index >= 2
+                                                &&
+                                                !collect(
+                                                    session(
+                                                        'applied_coupons',
+                                                        []
+                                                    )
+                                                )->contains(
+                                                        'voucher_id',
+                                                        $voucher->voucher_id
+                                                    )
+                                                ? 'hidden'
+                                                : ''
+                                            }}
+                                                                        ">
+
+                                                                                <label class="border
+                                                                                rounded-2xl
+                                                                                p-5
+                                                                                flex
+                                                                                justify-between
+                                                                                items-center
+                                                                                cursor-pointer">
+
+                                                                                    <div>
+
+                                                                                        <div class="font-black
+                                                                                        text-[#001e40]
+                                                                                        text-lg">
+
+                                                                                            {{ $voucher->code }}
+
+                                                                                        </div>
+
+                                                                                        <div class="text-gray-500
+                                                                                        mt-1">
+
+                                                                                            Giảm ship
+                                                                                            {{ number_format($voucher->value) }}đ
+
+                                                                                        </div>
+
+                                                                                    </div>
+
+                                                                                    <input type="radio" name="shipping_voucher" class="voucher-radio"
+                                                                                        data-type="shipping" value="{{ $voucher->voucher_id }}" @checked(
+                                                                                            collect(
+                                                                                                session(
+                                                                                                    'applied_coupons',
+                                                                                                    []
+                                                                                                )
+                                                                                            )->contains(
+                                                                                                    'voucher_id',
+                                                                                                    $voucher->voucher_id
+                                                                                                )
+                                                                                        )>
+
+                                                                                </label>
+
+                                                                            </div>
+
+                                        @endforeach
+
+                                    </div>
+
+                                    @if(count($shippingVouchers) > 2)
+
+                                            <button type="button" onclick="toggleVoucher(
+                                            'shipping'
+                                        )" class="mt-4
+                                            text-[#001e40]
+                                            font-bold">
+
+                                                <span id="shipping-text">
+
+                                                    Xem thêm
+
+                                                </span>
+
+                                            </button>
+
+                                    @endif
+
+                                </div>
+
+                                {{-- ================= PERCENT ================= --}}
+                                <div>
+
+                                    <h3 class="font-black
+                                text-xl
+                                mb-4">
+
+                                        Mã giảm %
+
+                                    </h3>
+
+                                    <div class="space-y-4">
+
+                                        @foreach($percentVouchers as $index => $voucher)
+
+                                                                            <div class="
+                                                                            percent-item
+                                                                            {{
+                                                $index >= 2
+                                                &&
+                                                !collect(
+                                                    session(
+                                                        'applied_coupons',
+                                                        []
+                                                    )
+                                                )->contains(
+                                                        'voucher_id',
+                                                        $voucher->voucher_id
+                                                    )
+                                                ? 'hidden'
+                                                : ''
+                                            }}
+                                                                        ">
+
+                                                                                <label class="border
+                                                                                rounded-2xl
+                                                                                p-5
+                                                                                flex
+                                                                                justify-between
+                                                                                items-center
+                                                                                cursor-pointer">
+
+                                                                                    <div>
+
+                                                                                        <div class="font-black
+                                                                                        text-[#001e40]
+                                                                                        text-lg">
+
+                                                                                            {{ $voucher->code }}
+
+                                                                                        </div>
+
+                                                                                        <div class="text-gray-500
+                                                                                        mt-1">
+
+                                                                                            Giảm
+                                                                                            {{ $voucher->value }}%
+
+                                                                                        </div>
+
+                                                                                    </div>
+
+                                                                                    <input type="radio" name="percent_voucher" class="voucher-radio"
+                                                                                        data-type="percent" value="{{ $voucher->voucher_id }}"
+                                                                                        @checked(collect(session('applied_coupons', []))->contains('voucher_id', $voucher->voucher_id))>
+
+                                                                                </label>
+
+                                                                            </div>
+
+                                        @endforeach
+
+                                    </div>
+
+                                    @if(count($percentVouchers) > 2)
+
+                                            <button type="button" onclick="toggleVoucher(
+                                            'percent'
+                                        )" class="mt-4
+                                            text-[#001e40]
+                                            font-bold">
+
+                                                <span id="percent-text">
+
+                                                    Xem thêm
+
+                                                </span>
+
+                                            </button>
+
+                                    @endif
+
+                                </div>
+
+                                {{-- ================= FIXED ================= --}}
+                                <div>
+
+                                    <h3 class="font-black
+                                text-xl
+                                mb-4">
+
+                                        Mã giảm tiền
+
+                                    </h3>
+
+                                    <div class="space-y-4">
+
+                                        @foreach($fixedVouchers as $index => $voucher)
+
+                                                                        <div class="fixed-item {{$index >= 2 && !collect(session('applied_coupons', []))
+                                            ->contains('voucher_id', $voucher->voucher_id) ? 'hidden' : ''}}">
+
+                                                                            <label class="border
+                                                                            rounded-2xl
+                                                                            p-5
+                                                                            flex
+                                                                            justify-between
+                                                                            items-center
+                                                                            cursor-pointer">
+
+                                                                                <div>
+
+                                                                                    <div class="font-black
+                                                                                    text-[#001e40]
+                                                                                    text-lg">
+
+                                                                                        {{ $voucher->code }}
+
+                                                                                    </div>
+
+                                                                                    <div class="text-gray-500
+                                                                                    mt-1">
+
+                                                                                        Giảm
+                                                                                        {{ number_format($voucher->value) }}đ
+
+                                                                                    </div>
+
+                                                                                </div>
+
+                                                                                <input type="radio" name="fixed_voucher" class="voucher-radio"
+                                                                                    data-type="fixed" value="{{ $voucher->voucher_id }}"
+                                                                                    @checked(collect(session('applied_coupons', []))->contains('voucher_id', $voucher->voucher_id))>
+
+                                                                            </label>
+
+                                                                        </div>
+
+                                        @endforeach
+
+                                    </div>
+
+                                    @if(count($fixedVouchers) > 2)
+
+                                            <button type="button" onclick="toggleVoucher(
+                                            'fixed'
+                                        )" class="mt-4
+                                            text-[#001e40]
+                                            font-bold">
+
+                                                <span id="fixed-text">
+
+                                                    Xem thêm
+
+                                                </span>
+
+                                            </button>
+
+                                    @endif
+
+                                </div>
+
+                            </div>
+
+                            {{-- FOOTER --}}
+                            <div class="border-t
+                        p-6
+                        flex
+                        justify-end
+                        gap-4">
+
+                                <button type="button" onclick="closeVoucherModal()" class="px-8
+                            py-3
+                            border
+                            rounded-xl">
+
+                                    Trở lại
+
+                                </button>
+
+                                <form action="{{ route('checkout.applyVoucherList') }}" method="POST">
+
+                                    @csrf
+
+                                    <input type="hidden" id="selected_vouchers" name="selected_vouchers">
+
+                                    <button type="submit" class="bg-[#ee4d2d]
+                                text-white
+                                px-8
+                                py-3
+                                rounded-xl
+                                font-bold">
+
+                                        Đồng ý
+
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </div>
+
+                    </div>
                     {{-- TOTAL --}}
                     <div class="mt-7 bg-[#001e40] rounded-[32px] p-6 text-white">
 
@@ -711,6 +1276,136 @@
     </div>
 
     <script>
+        function openVoucherModal() {
+
+            document
+                .getElementById(
+                    'voucherModal'
+                )
+                .classList
+                .remove(
+                    'hidden'
+                );
+
+            document
+                .getElementById(
+                    'voucherModal'
+                )
+                .classList
+                .add(
+                    'flex'
+                );
+        }
+
+        function closeVoucherModal() {
+
+            document
+                .getElementById(
+                    'voucherModal'
+                )
+                .classList
+                .remove(
+                    'flex'
+                );
+
+            document
+                .getElementById(
+                    'voucherModal'
+                )
+                .classList
+                .add(
+                    'hidden'
+                );
+        }
+
+        function toggleVoucher(type) {
+
+            const items =
+                document.querySelectorAll(
+                    '.' + type + '-item'
+                );
+
+            const text =
+                document.getElementById(
+                    type + '-text'
+                );
+
+            let expanded =
+                text.innerText
+                ===
+                'Thu gọn';
+
+            items.forEach(
+
+                (item, index) => {
+
+                    if (index >= 2) {
+
+                        item.classList.toggle(
+                            'hidden',
+                            expanded
+                        );
+                    }
+                }
+            );
+
+            text.innerText =
+                expanded
+                    ?
+                    'Xem thêm'
+                    :
+                    'Thu gọn';
+        }
+
+        let selected = {};
+
+        document
+            .querySelectorAll(
+                '.voucher-radio'
+            )
+            .forEach(radio => {
+
+                if (radio.checked) {
+
+                    selected[
+                        radio.dataset.type
+                    ] = radio.value;
+                }
+
+                radio.addEventListener(
+
+                    'change',
+
+                    function () {
+
+                        selected[
+                            this.dataset.type
+                        ] = this.value;
+
+                        document
+                            .getElementById(
+                                'selected_vouchers'
+                            )
+                            .value =
+                            JSON.stringify(
+                                Object.values(
+                                    selected
+                                )
+                            );
+                    }
+                );
+            });
+
+        document
+            .getElementById(
+                'selected_vouchers'
+            )
+            .value =
+            JSON.stringify(
+                Object.values(
+                    selected
+                )
+            );
 
         function toggleAddressType() {
 
@@ -754,8 +1449,8 @@
                 newCard.classList.remove(
                     'active'
                 );
-            }
-            else {
+
+            } else {
 
                 savedArea.style.display =
                     'none';
@@ -788,6 +1483,11 @@
                 'ward'
             );
 
+        /*
+        |--------------------------------------------------------------------------
+        | LOAD PROVINCES
+        |--------------------------------------------------------------------------
+        */
         async function loadProvinces() {
 
             const response =
@@ -798,6 +1498,9 @@
             const data =
                 await response.json();
 
+            province.innerHTML =
+                '<option value="">Chọn tỉnh / thành</option>';
+
             data.forEach(item => {
 
                 let option =
@@ -805,6 +1508,9 @@
                         item.name,
                         item.name
                     );
+
+                option.dataset.code =
+                    item.code;
 
                 if (
                     province.dataset.selected
@@ -814,15 +1520,19 @@
                     option.selected = true;
                 }
 
-                province.options[
-                    province.options.length
-                ] = option;
+                province.options.add(
+                    option
+                );
 
             });
-
         }
 
-        async function loadDistricts(name) {
+        /*
+        |--------------------------------------------------------------------------
+        | LOAD DISTRICTS
+        |--------------------------------------------------------------------------
+        */
+        async function loadDistricts(provinceName) {
 
             district.length = 1;
 
@@ -838,7 +1548,7 @@
 
             const provinceData =
                 provinces.find(
-                    p => p.name == name
+                    p => p.name == provinceName
                 );
 
             if (!provinceData) return;
@@ -859,6 +1569,9 @@
                         item.name
                     );
 
+                option.dataset.code =
+                    item.code;
+
                 if (
                     district.dataset.selected
                     ==
@@ -867,14 +1580,19 @@
                     option.selected = true;
                 }
 
-                district.options[
-                    district.options.length
-                ] = option;
+                district.options.add(
+                    option
+                );
 
             });
         }
 
-        async function loadWards(name) {
+        /*
+        |--------------------------------------------------------------------------
+        | LOAD WARDS
+        |--------------------------------------------------------------------------
+        */
+        async function loadWards(districtName) {
 
             ward.length = 1;
 
@@ -888,7 +1606,7 @@
 
             const districtData =
                 districts.find(
-                    d => d.name == name
+                    d => d.name == districtName
                 );
 
             if (!districtData) return;
@@ -917,24 +1635,186 @@
                     option.selected = true;
                 }
 
-                ward.options[
-                    ward.options.length
-                ] = option;
+                ward.options.add(
+                    option
+                );
 
             });
-
         }
 
-        province.onchange = function () {
+        /*
+        |--------------------------------------------------------------------------
+        | UPDATE SHIPPING FEE
+        |--------------------------------------------------------------------------
+        */
+        async function updateShippingFee(provinceName) {
 
-            loadDistricts(this.value);
+            if (!provinceName) return;
+
+            try {
+
+                const response =
+                    await fetch(
+
+                        "{{ route('shipping.fee') }}",
+
+                        {
+                            method: "POST",
+
+                            headers: {
+
+                                "Content-Type":
+                                    "application/json",
+
+                                "X-CSRF-TOKEN":
+                                    "{{ csrf_token() }}"
+                            },
+
+                            body: JSON.stringify({
+
+                                province: provinceName
+                            })
+                        }
+                    );
+
+                const data =
+                    await response.json();
+
+                let shippingText =
+                    document.getElementById(
+                        'shipping_fee_text'
+                    );
+
+                let shippingFee =
+                    Number(data.fee);
+
+                if (shippingFee <= 0) {
+
+                    shippingText.innerHTML =
+                        'FREE SHIP';
+
+                } else {
+
+                    shippingText.innerHTML =
+                        new Intl.NumberFormat(
+                            'vi-VN'
+                        ).format(shippingFee)
+                        + 'đ';
+                }
+
+                /*
+                |--------------------------------------------------------------------------
+                | TOTAL
+                |--------------------------------------------------------------------------
+                */
+                let subtotal =
+                                {{ $subtotal }};
+
+                let vat =
+                    subtotal * 0.1;
+
+                let total =
+                    subtotal
+                    + vat
+                    + shippingFee
+                    - {{ $discount }};
+
+                document.getElementById(
+                    'total_text'
+                ).innerHTML =
+
+                    new Intl.NumberFormat(
+                        'vi-VN'
+                    ).format(total)
+
+                    + 'đ';
+
+            } catch (error) {
+
+                console.log(error);
+
+            }
         }
 
-        district.onchange = function () {
+        /*
+        |--------------------------------------------------------------------------
+        | CHANGE PROVINCE
+        |--------------------------------------------------------------------------
+        */
+        province.addEventListener(
 
-            loadWards(this.value);
-        }
+            'change',
 
+            async function () {
+
+                await loadDistricts(
+                    this.value
+                );
+
+                updateShippingFee(
+                    this.value
+                );
+            }
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | CHANGE DISTRICT
+        |--------------------------------------------------------------------------
+        */
+        district.addEventListener(
+
+            'change',
+
+            async function () {
+
+                await loadWards(
+                    this.value
+                );
+            }
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | CHANGE SAVED ADDRESS
+        |--------------------------------------------------------------------------
+        */
+        document.querySelectorAll(
+            'input[name="shipping_address_id"]'
+        ).forEach(radio => {
+
+            radio.addEventListener(
+
+                'change',
+
+                async function () {
+
+                    const label =
+                        this.closest('label');
+
+                    const addressText =
+                        label.querySelector('p')
+                            .innerText;
+
+                    let arr =
+                        addressText.split(',');
+
+                    let province =
+                        arr[arr.length - 1]
+                            .trim();
+
+                    updateShippingFee(
+                        province
+                    );
+                }
+            );
+        });
+
+        /*
+        |--------------------------------------------------------------------------
+        | INIT
+        |--------------------------------------------------------------------------
+        */
         window.addEventListener(
 
             'load',
@@ -962,7 +1842,6 @@
                     await loadDistricts(
                         selectedProvince
                     );
-
                 }
 
                 if (selectedDistrict) {
@@ -973,7 +1852,6 @@
                     await loadWards(
                         selectedDistrict
                     );
-
                 }
 
                 if (selectedWard) {
@@ -984,173 +1862,6 @@
 
             }
         );
-
-        /*
-        |--------------------------------------------------------------------------
-        | KHI USER ĐỔI TỈNH / THÀNH
-        |--------------------------------------------------------------------------
-        */
-        document
-
-            .getElementById('province')
-
-            .addEventListener(
-
-                'change',
-
-                function () {
-                    /*
-                    |--------------------------------------------------------------------------
-                    | LẤY TỈNH ĐANG CHỌN
-                    |--------------------------------------------------------------------------
-                    */
-                    let province = this.value;
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | GỌI AJAX SANG LARAVEL
-                    |--------------------------------------------------------------------------
-                    */
-                    fetch(
-
-                        "{{ route('shipping.fee') }}",
-
-                        {
-                            method: "POST",
-
-                            headers: {
-
-                                /*
-                                |--------------------------------------------------------------------------
-                                | KIỂU JSON
-                                |--------------------------------------------------------------------------
-                                */
-                                "Content-Type":
-                                    "application/json",
-
-                                /*
-                                |--------------------------------------------------------------------------
-                                | CSRF TOKEN
-                                |--------------------------------------------------------------------------
-                                */
-                                "X-CSRF-TOKEN":
-                                    "{{ csrf_token() }}"
-                            },
-
-                            /*
-                            |--------------------------------------------------------------------------
-                            | DATA GỬI ĐI
-                            |--------------------------------------------------------------------------
-                            */
-                            body: JSON.stringify({
-
-                                province: province
-                            })
-                        }
-                    )
-
-                        /*
-                        |--------------------------------------------------------------------------
-                        | CHUYỂN RESPONSE SANG JSON
-                        |--------------------------------------------------------------------------
-                        */
-                        .then(res => res.json())
-
-                        /*
-                        |--------------------------------------------------------------------------
-                        | NHẬN DATA
-                        |--------------------------------------------------------------------------
-                        */
-                        .then(data => {
-
-                            /*
-                            |--------------------------------------------------------------------------
-                            | ELEMENT PHÍ SHIP
-                            |--------------------------------------------------------------------------
-                            */
-                            let shippingText =
-
-                                document.getElementById(
-                                    'shipping_fee_text'
-                                );
-
-                            /*
-                            |--------------------------------------------------------------------------
-                            | FREE SHIP
-                            |--------------------------------------------------------------------------
-                            */
-                            if (data.fee <= 0) {
-
-                                shippingText.innerHTML =
-                                    'FREE SHIP';
-                            }
-
-                            /*
-                            |--------------------------------------------------------------------------
-                            | CÓ PHÍ SHIP
-                            |--------------------------------------------------------------------------
-                            */
-                            else {
-
-                                shippingText.innerHTML =
-
-                                    new Intl.NumberFormat(
-                                        'vi-VN'
-                                    ).format(data.fee)
-
-                                    + 'đ';
-                            }
-
-                            /*
-                            |--------------------------------------------------------------------------
-                            | TẠM TÍNH
-                            |--------------------------------------------------------------------------
-                            */
-                            let subtotal =
-
-                        {{ $subtotal }};
-
-                            /*
-                            |--------------------------------------------------------------------------
-                            | VAT 10%
-                            |--------------------------------------------------------------------------
-                            */
-                            let vat =
-
-                                subtotal * 0.1;
-
-                            /*
-                            |--------------------------------------------------------------------------
-                            | TỔNG TIỀN
-                            |--------------------------------------------------------------------------
-                            */
-                            let total =
-
-                                subtotal
-                                + vat
-                                + data.fee;
-
-                            /*
-                            |--------------------------------------------------------------------------
-                            | UPDATE TỔNG TIỀN
-                            |--------------------------------------------------------------------------
-                            */
-                            document
-
-                                .getElementById(
-                                    'total_text'
-                                )
-
-                                .innerHTML =
-
-                                new Intl.NumberFormat(
-                                    'vi-VN'
-                                ).format(total)
-
-                                + 'đ';
-                        });
-                }
-            );
 
     </script>
 @endsection

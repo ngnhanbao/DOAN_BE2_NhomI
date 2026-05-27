@@ -297,10 +297,10 @@
                                 <div class="flex items-center gap-5">
 
                                     <div class="w-[60px] h-[60px]
-                        rounded-2xl
-                        bg-[#ae2070]/10
-                        flex items-center justify-center
-                        text-3xl">
+                                rounded-2xl
+                                bg-[#ae2070]/10
+                                flex items-center justify-center
+                                text-3xl">
 
                                         💗
 
@@ -488,19 +488,68 @@
                             </span>
 
                         </div>
-                        <div class="flex items-center justify-between gap-3">
+                        {{-- VOUCHER --}}
+                        <div class="mt-6 bg-white border border-gray-200 rounded-[28px] p-5">
 
-                            <span class="text-gray-500 text-lg">
-                                Giảm giá
-                            </span>
+                            <div class="flex items-center justify-between mb-4">
 
-                            <span class="font-black text-red-500 text-[18px] text-right break-words">
+                                <div>
 
-                                -{{ number_format($discount) }}đ
+                                    <h3 class="font-black text-[#001e40] text-lg">
+                                        Voucher giảm giá
+                                    </h3>
 
-                            </span>
+                                    @if(session('coupon'))
+
+                                        <p class="text-green-600 text-sm mt-1">
+                                            Đã áp dụng:
+                                            <span class="font-bold">
+                                                {{ session('coupon') }}
+                                            </span>
+                                        </p>
+
+                                    @endif
+
+                                </div>
+
+                                @if(session('discount_amount'))
+
+                                    <div class="bg-green-100 text-green-700 px-4 py-2 rounded-2xl font-black">
+
+                                        -{{ number_format(session('discount_amount')) }}đ
+
+                                    </div>
+
+                                @endif
+
+                            </div>
+
+                            @if(count(session('discount_details', [])) > 0)
+
+                                <div class="mt-4 space-y-2">
+
+                                    @foreach(session('discount_details', []) as $item)
+
+                                        <div class="flex justify-between text-sm">
+
+                                            <span class="text-gray-500">
+                                                {{ $item['code'] }}
+                                            </span>
+
+                                            <span class="text-red-500 font-bold">
+                                                -{{ number_format($item['amount']) }}đ
+                                            </span>
+
+                                        </div>
+
+                                    @endforeach
+
+                                </div>
+
+                            @endif
 
                         </div>
+
 
                     </div>
 

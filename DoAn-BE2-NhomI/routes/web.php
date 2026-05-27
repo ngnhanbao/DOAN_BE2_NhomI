@@ -183,7 +183,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     //Báo cáo doanh thu
     // Route::get('/admin/revenue-reports', [RevenueReportController::class, 'index'])
     //     ->name('admin.revenue_reports.index');
-    Route::get('/revenue-reports',[RevenueReportController::class, 'index'])
+    Route::get('/revenue-reports', [RevenueReportController::class, 'index'])
         ->name('revenue_reports.index');
 });
 
@@ -321,6 +321,26 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/vnpay/return', [OrderController::class, 'vnpayReturn'])
         ->name('vnpay.return');
+
+    /*
+       |--------------------------------------------------------------------------
+       | THÊM VOUCHER TỪ DANH SÁCH
+       |--------------------------------------------------------------------------
+       */
+    Route::post(
+        '/checkout/apply-voucher-list',
+        [OrderController::class, 'applyVoucherList']
+    )->name('checkout.applyVoucherList');
+
+     /*
+       |--------------------------------------------------------------------------
+       | XOÁ VOUCHER 
+       |--------------------------------------------------------------------------
+       */
+   Route::post(
+    '/checkout/remove-voucher',
+    [OrderController::class, 'removeVoucher']
+)->name('checkout.removeVoucher');
 });
 
 /*

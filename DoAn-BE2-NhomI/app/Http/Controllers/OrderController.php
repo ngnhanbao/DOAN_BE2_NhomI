@@ -10,6 +10,7 @@ use App\Models\Payment;
 use App\Models\ProductVariant;
 use App\Models\ShippingAddress;
 use App\Models\Cart;
+use App\Models\Voucher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -199,6 +200,7 @@ class OrderController extends Controller
 
         session()->forget([
             'checkout_items',
+            'applied_coupons',
             'selected_cart_ids',
             'checkout_information',
             'checkout_total',
@@ -241,11 +243,51 @@ class OrderController extends Controller
         }
 
         $shippingFee = session('shipping_fee', 30000);
-        $discount = session('discount_amount', 0);
+        $discount =
+            $this->calculateDiscount(
+                $subtotal,
+                $shippingFee
+            );
         $vat = $subtotal * 0.1;
 
         $total = $subtotal + $shippingFee + $vat - $discount;
+        /*
+        |--------------------------------------------------------------------------
+        | VOUCHERS
+        |--------------------------------------------------------------------------
+        */
+        $shippingVouchers =
+            Voucher::where(
+                'type',
+                'shipping'
+            )
+                ->where(
+                    'is_active',
+                    1
+                )
+                ->get();
 
+        $percentVouchers =
+            Voucher::where(
+                'type',
+                'percent'
+            )
+                ->where(
+                    'is_active',
+                    1
+                )
+                ->get();
+
+        $fixedVouchers =
+            Voucher::where(
+                'type',
+                'fixed'
+            )
+                ->where(
+                    'is_active',
+                    1
+                )
+                ->get();
         $shippingAddress = ShippingAddress::where('user_id', Auth::id())
             ->orderByDesc('address_id')
             ->first();
@@ -368,11 +410,57 @@ class OrderController extends Controller
 
         $shippingFee = $this->getShippingFeeByProvince($province);
 
-        $discount = 0;
+        $discount =
+            $this->calculateDiscount(
+                $subtotal,
+                $shippingFee
+            );
+        $coupons =
+            session(
+                'applied_coupons',
+                []
+            );
 
         $vat = $subtotal * 0.1;
 
         $total = $subtotal + $shippingFee + $vat - $discount;
+        /*
+|--------------------------------------------------------------------------
+| VOUCHERS
+|--------------------------------------------------------------------------
+*/
+        $shippingVouchers =
+            Voucher::where(
+                'type',
+                'shipping'
+            )
+                ->where(
+                    'is_active',
+                    1
+                )
+                ->get();
+
+        $percentVouchers =
+            Voucher::where(
+                'type',
+                'percent'
+            )
+                ->where(
+                    'is_active',
+                    1
+                )
+                ->get();
+
+        $fixedVouchers =
+            Voucher::where(
+                'type',
+                'fixed'
+            )
+                ->where(
+                    'is_active',
+                    1
+                )
+                ->get();
         return view(
             'checkout.index',
             compact(
@@ -383,7 +471,12 @@ class OrderController extends Controller
                 'discount',
                 'total',
                 'vat',
-                'oldInfo'
+                'oldInfo',
+                'coupons',
+
+                'shippingVouchers',
+                'percentVouchers',
+                'fixedVouchers'
             )
         );
     }
@@ -487,11 +580,53 @@ class OrderController extends Controller
         );
 
         $shippingFee = $this->getShippingFeeByProvince($province);
-        $discount = 0;
+        $discount =
+            $this->calculateDiscount(
+                $subtotal,
+                $shippingFee
+            );
+
+
         $vat = $subtotal * 0.1;
 
         $total = $subtotal + $shippingFee + $vat - $discount;
+        /*
+        |--------------------------------------------------------------------------
+        | VOUCHERS
+        |--------------------------------------------------------------------------
+        */
+        $shippingVouchers =
+            Voucher::where(
+                'type',
+                'shipping'
+            )
+                ->where(
+                    'is_active',
+                    1
+                )
+                ->get();
 
+        $percentVouchers =
+            Voucher::where(
+                'type',
+                'percent'
+            )
+                ->where(
+                    'is_active',
+                    1
+                )
+                ->get();
+
+        $fixedVouchers =
+            Voucher::where(
+                'type',
+                'fixed'
+            )
+                ->where(
+                    'is_active',
+                    1
+                )
+                ->get();
         $addresses = ShippingAddress::where('user_id', Auth::id())->get();
 
         return view(
@@ -546,12 +681,58 @@ class OrderController extends Controller
             }
 
             $shippingFee = $this->getShippingFeeByProvince($info['province']);
+            $coupons =
+                session(
+                    'applied_coupons',
+                    []
+                );
+            $discount =
+                $this->calculateDiscount(
+                    $subtotal,
+                    $shippingFee
+                );
 
-            $discount = 0;
+
             $vat = $subtotal * 0.1;
 
             $total = $subtotal + $shippingFee + $vat - $discount;
+            /*
+            |--------------------------------------------------------------------------
+            | VOUCHERS
+            |--------------------------------------------------------------------------
+            */
+            $shippingVouchers =
+                Voucher::where(
+                    'type',
+                    'shipping'
+                )
+                    ->where(
+                        'is_active',
+                        1
+                    )
+                    ->get();
 
+            $percentVouchers =
+                Voucher::where(
+                    'type',
+                    'percent'
+                )
+                    ->where(
+                        'is_active',
+                        1
+                    )
+                    ->get();
+
+            $fixedVouchers =
+                Voucher::where(
+                    'type',
+                    'fixed'
+                )
+                    ->where(
+                        'is_active',
+                        1
+                    )
+                    ->get();
             $shippingAddressId = null;
 
             if ($info['delivery_type'] == 'home') {
@@ -587,7 +768,9 @@ class OrderController extends Controller
             $order = Order::create([
                 'user_id' => Auth::id(),
                 'shipping_address_id' => $shippingAddressId,
-                'voucher_id' => null,
+                'voucher_id' =>
+                    $coupons[0]['voucher_id']
+                    ?? null,
                 'order_code' => 'ORD-' . time(),
                 'subtotal' => $subtotal,
                 'shipping_fee' => $shippingFee,
@@ -625,7 +808,19 @@ class OrderController extends Controller
 
                 $variant->decrement('stock_quantity', $item['quantity']);
             }
+           if (!empty(session('applied_coupons'))) {
 
+    foreach (session('applied_coupons') as $coupon) {
+
+        Voucher::where(
+            'voucher_id',
+            $coupon['voucher_id']
+        )->increment(
+            'used_count',
+            1
+        );
+    }
+}
             Payment::create([
                 'order_id' => $order->order_id,
                 'gateway' => $request->payment_method,
@@ -679,12 +874,28 @@ class OrderController extends Controller
                 ]);
 
             session()->forget([
-                'checkout_items',
-                'selected_cart_ids',
-                'checkout_information',
-                'is_reorder',
-            ]);
 
+                'checkout_items',
+
+                'applied_coupons',
+
+                'selected_cart_ids',
+
+                'checkout_information',
+
+                'is_reorder',
+
+                'discount_details',
+
+                'discount_amount',
+
+                'coupon',
+
+                'applied_voucher'
+            ]);
+session()->forget(
+    'applied_voucher'
+);
             DB::commit();
 
             return redirect()
@@ -742,7 +953,11 @@ class OrderController extends Controller
 
         $shippingFee = session('shipping_fee', 30000);
 
-        $discount = session('discount_amount', 0);
+        $discount =
+            $this->calculateDiscount(
+                $subtotal,
+                $shippingFee
+            );
 
         $vat = $subtotal * 0.1;
 
@@ -839,13 +1054,26 @@ class OrderController extends Controller
                 ->delete();
 
             session()->forget([
-                'pending_order_id',
-                'selected_cart_ids',
-                'checkout_information',
-                'checkout_items',
-                'is_reorder',
-            ]);
 
+                'checkout_items',
+
+                'applied_coupons',
+
+                'selected_cart_ids',
+
+                'checkout_information',
+
+                'is_reorder',
+
+                'discount_details',
+
+                'discount_amount',
+
+                'coupon',
+
+                'applied_voucher'
+            ]);
+session()->save();
             return redirect()
                 ->route('orders.history')
                 ->with('success_order', [
@@ -972,10 +1200,11 @@ class OrderController extends Controller
             30000
         );
 
-        $discount = session(
-            'discount_amount',
-            0
-        );
+        $discount =
+            $this->calculateDiscount(
+                $subtotal,
+                $shippingFee
+            );
         $vat = $subtotal * 0.1;
 
         $total =
@@ -1016,15 +1245,6 @@ class OrderController extends Controller
             )
         );
 
-        return view(
-            'checkout.vnpay',
-            compact(
-                'amount',
-                'orderCode',
-                'qr',
-                'request'
-            )
-        );
 
     }
 
@@ -1069,11 +1289,24 @@ class OrderController extends Controller
             }
 
             session()->forget([
+
                 'checkout_items',
+
+                'applied_coupons',
+
                 'selected_cart_ids',
+
                 'checkout_information',
+
                 'is_reorder',
-                'pending_order_id',
+
+                'discount_details',
+
+                'discount_amount',
+
+                'coupon',
+
+                'applied_voucher'
             ]);
 
             return redirect()
@@ -1136,5 +1369,374 @@ class OrderController extends Controller
         $shipping = ShippingFee::where('province', $province)->first();
 
         return $shipping ? $shipping->fee : 30000;
+    }
+    private function calculateDiscount(
+        $subtotal,
+        &$shippingFee
+    ) {
+
+        $discount = 0;
+        $discountDetails = [];
+        $coupons =
+            session(
+                'applied_coupons',
+                []
+            );
+
+        /*
+        |--------------------------------------------------------------------------
+        | LẤY VOUCHER TỪ CART
+        |--------------------------------------------------------------------------
+        */
+        if (session('applied_voucher')) {
+
+            $voucher =
+                Voucher::find(
+                    session('applied_voucher')
+                );
+
+            if ($voucher) {
+
+                $exists = false;
+
+                /*
+                |--------------------------------------------------------------------------
+                | CHECK TRÙNG CODE
+                |--------------------------------------------------------------------------
+                */
+                foreach ($coupons as $item) {
+
+                    if (
+                        $item['voucher_id']
+                        ==
+                        $voucher->voucher_id
+                    ) {
+
+                        $exists = true;
+                        break;
+                    }
+                }
+
+                if (!$exists) {
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | CHECK TRÙNG TYPE
+                    |--------------------------------------------------------------------------
+                    */
+                    $sameType = false;
+
+                    foreach ($coupons as $item) {
+
+                        if (
+                            $item['type']
+                            ==
+                            $voucher->type
+                        ) {
+
+                            $sameType = true;
+                            break;
+                        }
+                    }
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | THÊM VOUCHER
+                    |--------------------------------------------------------------------------
+                    */
+                    if (!$sameType) {
+
+                        $coupons[] = [
+
+                            'voucher_id' =>
+                                $voucher->voucher_id,
+
+                            'code' =>
+                                $voucher->code,
+
+                            'type' =>
+                                $voucher->type,
+
+                            'value' =>
+                                $voucher->value,
+
+                            'max_discount' =>
+                                $voucher->max_discount
+                        ];
+
+                        session([
+                            'applied_coupons'
+                            =>
+                                $coupons
+                        ]);
+                    }
+                }
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | CALCULATE DISCOUNT
+        |--------------------------------------------------------------------------
+        */
+        foreach ($coupons as $coupon) {
+
+            /*
+            |--------------------------------------------------------------------------
+            | SHIPPING
+            |--------------------------------------------------------------------------
+            */
+            if ($coupon['type'] == 'shipping') {
+
+                $originalShipping =
+                    $shippingFee;
+
+                $shippingFee = max(
+
+                    0,
+
+                    $shippingFee
+                    -
+                    $coupon['value']
+                );
+
+                $shippingDiscount =
+
+                    $originalShipping
+                    -
+                    $shippingFee;
+
+                if ($shippingDiscount > 0) {
+
+                    $discount +=
+                        $shippingDiscount;
+
+                    $discountDetails[] = [
+
+                        'code' =>
+                            $coupon['code'],
+
+                        'amount' =>
+                            $shippingDiscount
+                    ];
+                }
+
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | PERCENT
+            |--------------------------------------------------------------------------
+            */ elseif ($coupon['type'] == 'percent') {
+
+                $percentDiscount =
+
+                    $subtotal
+                    *
+                    (
+                        $coupon['value']
+                        / 100
+                    );
+
+                if (
+                    !empty(
+                    $coupon['max_discount']
+                )
+                ) {
+
+                    $percentDiscount =
+                        min(
+                            $percentDiscount,
+                            $coupon['max_discount']
+                        );
+                }
+
+                $discount +=
+                    $percentDiscount;
+                $discountDetails[] = [
+
+                    'code' =>
+                        $coupon['code'],
+
+                    'amount' =>
+                        $percentDiscount
+                ];
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | FIXED
+            |--------------------------------------------------------------------------
+            */ else {
+
+                $fixedDiscount = min(
+
+                    $coupon['value'],
+
+                    $subtotal
+                );
+
+                $discount +=
+                    $fixedDiscount;
+
+                $discountDetails[] = [
+
+                    'code' =>
+                        $coupon['code'],
+
+                    'amount' =>
+                        $fixedDiscount
+                ];
+            }
+        }
+
+        session([
+            'discount_details'
+            =>
+                $discountDetails
+        ]);
+
+        return $discount;
+    }
+    public function applyVoucherList(
+        Request $request
+    ) {
+
+        $ids =
+            json_decode(
+                $request->selected_vouchers,
+                true
+            );
+
+        $coupons = [];
+
+        if ($ids) {
+
+            foreach ($ids as $id) {
+
+                $voucher =
+                    Voucher::find($id);
+
+                if ($voucher) {
+
+                    $coupons[] = [
+
+                        'voucher_id' =>
+                            $voucher->voucher_id,
+
+                        'code' =>
+                            $voucher->code,
+
+                        'type' =>
+                            $voucher->type,
+
+                        'value' =>
+                            $voucher->value,
+
+                        'max_discount' =>
+                            $voucher->max_discount
+                    ];
+                }
+            }
+        }
+
+        session([
+            'applied_coupons'
+            =>
+                $coupons
+        ]);
+
+        return back()->with(
+            'success',
+            'Áp dụng voucher thành công.'
+        );
+    }
+    public function removeVoucher(
+        Request $request
+    ) {
+
+        /*
+        |--------------------------------------------------------------------------
+        | CHECKOUT
+        |--------------------------------------------------------------------------
+        */
+        $coupons =
+            session(
+                'applied_coupons',
+                []
+            );
+
+        $removed = null;
+
+        $coupons = array_filter(
+
+            $coupons,
+
+            function ($item) use ($request, &$removed) {
+
+                if (
+                    $item['code']
+                    ==
+                    $request->code
+                ) {
+
+                    $removed = $item;
+
+                    return false;
+                }
+
+                return true;
+            }
+        );
+
+        $coupons =
+            array_values(
+                $coupons
+            );
+
+        session([
+            'applied_coupons'
+            =>
+                $coupons
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | CART
+        |--------------------------------------------------------------------------
+        */
+        if (
+            $removed
+            &&
+            isset(
+            $removed['voucher_id']
+        )
+        ) {
+
+            $cartVoucherId =
+                session(
+                    'applied_voucher'
+                );
+
+            if (
+                $cartVoucherId
+                ==
+                $removed['voucher_id']
+            ) {
+
+                session()->forget(
+                    'applied_voucher'
+                );
+            }
+        }
+
+        return back()->with(
+
+            'success',
+
+            'Đã xoá voucher '
+            .
+            $request->code
+        );
     }
 }
