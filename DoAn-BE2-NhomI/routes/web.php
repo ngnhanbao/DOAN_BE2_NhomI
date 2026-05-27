@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\Admin\AttributeController;
 use App\Http\Controllers\Admin\OrderStatisticController;
 use App\Http\Controllers\Admin\RevenueReportController;
+use App\Http\Controllers\Admin\StockLogController;
 
 /*
 |--------------------------------------------------------------------------
@@ -176,8 +177,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::delete('backups/{id}', [App\Http\Controllers\Admin\BackupController::class, 'destroy'])
             ->name('backups.destroy');
 
-        Route::get('/revenue-reports',[RevenueReportController::class, 'index'])
+        Route::get('/revenue-reports', [RevenueReportController::class, 'index'])
             ->name('revenue_reports.index');
+
+        Route::get('stock-logs', [StockLogController::class, 'index'])
+            ->name('stock-logs.index');
     });
 
     Route::resource('attributes', AttributeController::class);
@@ -356,4 +360,3 @@ Route::get('/api/prices/sync', [App\Http\Controllers\Api\ProductPriceController:
 
 Route::post('/get-shipping-fee', [OrderController::class, 'getShippingFeeAjax'])
     ->name('shipping.fee');
-
