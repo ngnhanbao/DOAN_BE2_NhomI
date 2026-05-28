@@ -103,6 +103,11 @@
                 class="flex items-center gap-3 px-4 py-3 text-sm font-medium {{ request()->routeIs('admin.permissions.*') ? 'bg-white/20 text-white' : 'text-blue-200 hover:bg-white/10' }} rounded-lg transition-colors">
                 <i data-lucide="shield-check" class="w-5 h-5"></i> Phân quyền
             </a>
+            <a href="{{ route('admin.stock-logs.index') }}"
+                class="flex items-center gap-3 px-4 py-3 text-sm font-medium {{ request()->routeIs('admin.stock-logs.*') ? 'bg-white/20 text-white' : 'text-blue-200 hover:bg-white/10' }} rounded-lg transition-colors">
+                <i data-lucide="history" class="w-5 h-5"></i>
+                Nhật ký kho hàng
+            </a>
 
             <a href="{{ route('home') }}"
                 class="flex items-center gap-3 px-4 py-3 text-sm font-medium {{ request()->routeIs('admin.backups.*') ? 'bg-white/20 text-white' : 'text-blue-200 hover:bg-white/10' }} rounded-lg transition-colors">
@@ -143,16 +148,16 @@
         <!-- Content -->
         <div class="flex-1 overflow-y-auto p-8 relative">
             @if(session('success'))
-                <div
-                    class="mb-4 p-4 bg-[#E2F6EA] text-[#0FAF62] rounded-lg font-medium text-sm flex items-center gap-2 shadow-sm border border-[#0FAF62]/20">
-                    <i data-lucide="check-circle" class="w-5 h-5"></i> {!! session('success') !!}
-                </div>
+            <div
+                class="mb-4 p-4 bg-[#E2F6EA] text-[#0FAF62] rounded-lg font-medium text-sm flex items-center gap-2 shadow-sm border border-[#0FAF62]/20">
+                <i data-lucide="check-circle" class="w-5 h-5"></i> {!! session('success') !!}
+            </div>
             @endif
             @if(session('error'))
-                <div
-                    class="mb-4 p-4 bg-red-50 text-red-600 rounded-lg font-medium text-sm flex items-center gap-2 shadow-sm border border-red-200">
-                    <i data-lucide="alert-triangle" class="w-5 h-5"></i> {!! session('error') !!}
-                </div>
+            <div
+                class="mb-4 p-4 bg-red-50 text-red-600 rounded-lg font-medium text-sm flex items-center gap-2 shadow-sm border border-red-200">
+                <i data-lucide="alert-triangle" class="w-5 h-5"></i> {!! session('error') !!}
+            </div>
             @endif
 
             @yield('content')
