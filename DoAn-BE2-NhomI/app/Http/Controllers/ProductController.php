@@ -25,12 +25,13 @@ class ProductController extends Controller
     // chi tiết sản phẩm
     public function show($id)
     {
+        // 1. Lấy thông tin sản phẩm
         $product = DB::table('products')
             ->where('product_id', $id)
+            ->where('is_active', 1)
             ->first();
-
         if (!$product) {
-            abort(404);
+            return redirect()->route('home')->with('error', 'Sản phẩm không tồn tại hoặc đã ngừng kinh doanh.');
         }
 
         $images = DB::table('product_images')
