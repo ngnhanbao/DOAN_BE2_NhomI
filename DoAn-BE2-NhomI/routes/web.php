@@ -22,7 +22,7 @@ use App\Http\Controllers\Admin\AttributeController;
 use App\Http\Controllers\Admin\OrderStatisticController;
 use App\Http\Controllers\Admin\RevenueReportController;
 use App\Http\Controllers\Admin\InventoryLogController;
-
+use App\Http\Controllers\Admin\StockLogController;
 /*
 |--------------------------------------------------------------------------
 | PUBLIC ROUTES
@@ -81,10 +81,8 @@ Route::middleware('guest')->group(function () {
     });
 });
 
-Route::post('/logout', function () {
-    Auth::logout();
-    return redirect('/');
-})->name('logout');
+Route::post('/logout', [CrudUserController::class, 'logout'])
+    ->name('logout');
 
 /*
 |--------------------------------------------------------------------------
@@ -182,11 +180,49 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::delete('reviews/{id}', [ReviewController::class, 'destroy'])
         ->name('reviews.destroy');
 
+
+    Route::middleware(['admin.only'])->group(function () {
+        Route::patch(
+            'permissions/{id}/toggle-status',
+            [App\Http\Controllers\Admin\PermissionController::class, 'toggleStatus']
+        )->name('permissions.toggle-status');
+
+        Route::resource('permissions', App\Http\Controllers\Admin\PermissionController::class);
+
+        Route::get('backups', [App\Http\Controllers\Admin\BackupController::class, 'index'])
+            ->name('backups.index');
+
+        Route::post('backups', [App\Http\Controllers\Admin\BackupController::class, 'create'])
+            ->name('backups.create');
+
+        Route::post('backups/upload', [App\Http\Controllers\Admin\BackupController::class, 'uploadRestore'])
+            ->name('backups.upload');
+
+        Route::get('backups/{id}/download', [App\Http\Controllers\Admin\BackupController::class, 'download'])
+            ->name('backups.download');
+
+        Route::post('backups/{id}/restore', [App\Http\Controllers\Admin\BackupController::class, 'restore'])
+            ->name('backups.restore');
+
+        Route::delete('backups/{id}', [App\Http\Controllers\Admin\BackupController::class, 'destroy'])
+            ->name('backups.destroy');
+
+        Route::get('/revenue-reports', [RevenueReportController::class, 'index'])
+            ->name('revenue_reports.index');
+
+        Route::get('stock-logs', [StockLogController::class, 'index'])
+            ->name('stock-logs.index');
+        
+        Route::get('/login-history', [CrudUserController::class, 'loginHistory'])
+            ->name('login.history');
+    });
+
     /*
     |--------------------------------------------------------------------------
     | ATTRIBUTES
     |--------------------------------------------------------------------------
     */
+
 
     Route::resource('attributes', AttributeController::class);
 
