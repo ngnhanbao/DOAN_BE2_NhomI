@@ -65,6 +65,9 @@ class ProductController extends Controller
         );
     }
 
+
+
+    
     public function storeReview(Request $request, $id)
     {
         $request->validate([
