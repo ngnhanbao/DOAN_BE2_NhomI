@@ -3,7 +3,7 @@
 @section('title', 'Nhật ký Kho hàng')
 
 @section('header_search')
-<form action="{{ route('admin.stock-logs.index') }}" method="GET" class="relative">
+<form action="{{ route('admin.inventory-logs.index') }}" method="GET" class="relative">
     <i data-lucide="search" class="absolute left-4 top-2.5 text-gray-400 w-5 h-5"></i>
 
     <input
@@ -160,7 +160,7 @@ $actionMap = [
 
         {{-- Filters --}}
         <div class="p-6 border-b border-gray-100 flex flex-wrap items-center justify-between gap-4 bg-[#f2f4f6]/70">
-            <form action="{{ route('admin.stock-logs.index') }}" method="GET" class="flex items-center gap-4">
+            <form action="{{ route('admin.inventory-logs.index') }}" method="GET" class="flex items-center gap-4">
                 <div class="flex items-center gap-2 px-4 py-2 bg-white rounded-md border border-gray-200 text-sm">
                     <span class="text-gray-500 font-medium">Hành động:</span>
 

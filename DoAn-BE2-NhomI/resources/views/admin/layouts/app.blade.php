@@ -103,13 +103,13 @@
                 class="flex items-center gap-3 px-4 py-3 text-sm font-medium {{ request()->routeIs('admin.permissions.*') ? 'bg-white/20 text-white' : 'text-blue-200 hover:bg-white/10' }} rounded-lg transition-colors">
                 <i data-lucide="shield-check" class="w-5 h-5"></i> Phân quyền
             </a>
-            <a href="{{ route('admin.stock-logs.index') }}"
-                class="flex items-center gap-3 px-4 py-3 text-sm font-medium {{ request()->routeIs('admin.stock-logs.*') ? 'bg-white/20 text-white' : 'text-blue-200 hover:bg-white/10' }} rounded-lg transition-colors">
+            <a href="{{ route('admin.inventory-logs.index') }}"
+                class="flex items-center gap-3 px-4 py-3 text-sm font-medium {{ request()->routeIs('admin.inventory-logs.*') ? 'bg-white/20 text-white' : 'text-blue-200 hover:bg-white/10' }} rounded-lg transition-colors">
                 <i data-lucide="history" class="w-5 h-5"></i>
                 Nhật ký kho hàng
             </a>
             <a href="{{ route('admin.login.history') }}"
-                class="flex items-center gap-3 px-4 py-3 text-sm font-medium {{ request()->routeIs('admin.stock-logs.*') ? 'bg-white/20 text-white' : 'text-blue-200 hover:bg-white/10' }} rounded-lg transition-colors">
+                class="flex items-center gap-3 px-4 py-3 text-sm font-medium {{ request()->routeIs('admin.login.history') ? 'bg-white/20 text-white' : 'text-blue-200 hover:bg-white/10' }} rounded-lg transition-colors">
                 <i data-lucide="history" class="w-5 h-5"></i>
                Lịch sử đăng nhập
             </a>

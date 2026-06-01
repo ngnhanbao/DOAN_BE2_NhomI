@@ -110,7 +110,23 @@ class CheckoutController extends Controller
                     'subtotal' => $item['price'] * $item['quantity'],
                 ]);
 
+                // Ghi log xuất kho
+                $oldStock = (int) $variant->stock_quantity;
+                $newStock = $oldStock - (int) $item['quantity'];
+
                 $variant->decrement('stock_quantity', $item['quantity']);
+
+                DB::table('inventory_logs')->insert([
+                    'variant_id' => $variant->variant_id,
+                    'order_id' => $order->order_id,
+                    'user_id' => Auth::id(),
+                    'action_type' => 'export',
+                    'quantity_change' => -1 * (int) $item['quantity'],
+                    'stock_after' => $newStock,
+                    'note' => 'Xuất kho khi đặt hàng (CheckoutController)',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
             }
 
             Payment::create([

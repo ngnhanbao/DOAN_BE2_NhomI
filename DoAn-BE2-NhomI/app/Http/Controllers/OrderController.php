@@ -192,8 +192,28 @@ class OrderController extends Controller
 
             // Hoàn lại số lượng tồn kho
             foreach ($order->items as $item) {
-                ProductVariant::where('variant_id', $item->variant_id)
-                    ->increment('stock_quantity', $item->quantity);
+                $variant = ProductVariant::where('variant_id', $item->variant_id)
+                    ->lockForUpdate()
+                    ->first();
+
+                if ($variant) {
+                    $oldStock = (int) $variant->stock_quantity;
+                    $newStock = $oldStock + (int) $item->quantity;
+
+                    $variant->increment('stock_quantity', $item->quantity);
+
+                    DB::table('inventory_logs')->insert([
+                        'variant_id' => $variant->variant_id,
+                        'order_id' => $order->order_id,
+                        'user_id' => Auth::id(),
+                        'action_type' => 'import',
+                        'quantity_change' => (int) $item->quantity,
+                        'stock_after' => $newStock,
+                        'note' => 'Hoàn kho khi huỷ đơn (order: ' . ($order->order_code ?? $order->order_id) . ')',
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                }
             }
 
             // Hoàn trả lượt dùng Voucher nếu có
@@ -693,7 +713,23 @@ class OrderController extends Controller
                     'subtotal' => $item['price'] * $item['quantity'],
                 ]);
 
+                // Ghi log xuất kho vào inventory_logs (action_type = export)
+                $oldStock = (int) $variant->stock_quantity;
+                $newStock = $oldStock - (int) $item['quantity'];
+
                 $variant->decrement('stock_quantity', $item['quantity']);
+
+                DB::table('inventory_logs')->insert([
+                    'variant_id' => $variant->variant_id,
+                    'order_id' => $order->order_id,
+                    'user_id' => Auth::id(),
+                    'action_type' => 'export',
+                    'quantity_change' => -1 * (int) $item['quantity'],
+                    'stock_after' => $newStock,
+                    'note' => 'Xuất kho khi đặt hàng (order: ' . ($order->order_code ?? $order->order_id) . ')',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
             }
 
             Payment::create([
@@ -1173,8 +1209,28 @@ class OrderController extends Controller
         }
 
         foreach ($order->items as $item) {
-            ProductVariant::where('variant_id', $item->variant_id)
-                ->increment('stock_quantity', $item->quantity);
+            $variant = ProductVariant::where('variant_id', $item->variant_id)
+                ->lockForUpdate()
+                ->first();
+
+            if ($variant) {
+                $oldStock = (int) $variant->stock_quantity;
+                $newStock = $oldStock + (int) $item->quantity;
+
+                $variant->increment('stock_quantity', $item->quantity);
+
+                DB::table('inventory_logs')->insert([
+                    'variant_id' => $variant->variant_id,
+                    'order_id' => $order->order_id,
+                    'user_id' => Auth::id(),
+                    'action_type' => 'import',
+                    'quantity_change' => (int) $item->quantity,
+                    'stock_after' => $newStock,
+                    'note' => 'Hoàn kho do thanh toán thất bại (order: ' . ($order->order_code ?? $order->order_id) . ')',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
         }
 
         return redirect()

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class OrderStatisticController extends Controller
 {
@@ -269,7 +270,23 @@ class OrderStatisticController extends Controller
                     throw new \Exception('Sản phẩm ' . ($variant->product->name ?? '') . ' không đủ tồn kho!');
                 }
 
+                // Ghi log xuất kho khi admin tạo đơn
+                $oldStock = (int) $variant->stock_quantity;
+                $newStock = $oldStock - (int) $item['quantity'];
+
                 $variant->decrement('stock_quantity', $item['quantity']);
+
+                DB::table('inventory_logs')->insert([
+                    'variant_id' => $variant->variant_id,
+                    'order_id' => null,
+                    'user_id' => Auth::id(),
+                    'action_type' => 'export',
+                    'quantity_change' => -1 * (int) $item['quantity'],
+                    'stock_after' => $newStock,
+                    'note' => 'Xuất kho khi tạo đơn (admin)',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
 
                 $unitPrice = $item['price'];
                 $qty = $item['quantity'];
@@ -404,8 +421,28 @@ class OrderStatisticController extends Controller
             if ($newStatus == 'cancelled' && $oldStatus != 'cancelled') {
                 // Hoàn kho
                 foreach ($order->items as $item) {
-                    \App\Models\ProductVariant::where('variant_id', $item->variant_id)
-                        ->increment('stock_quantity', $item->quantity);
+                    $variant = \App\Models\ProductVariant::where('variant_id', $item->variant_id)
+                        ->lockForUpdate()
+                        ->first();
+
+                    if ($variant) {
+                        $oldStock = (int) $variant->stock_quantity;
+                        $newStock = $oldStock + (int) $item->quantity;
+
+                        $variant->increment('stock_quantity', $item->quantity);
+
+                        DB::table('inventory_logs')->insert([
+                            'variant_id' => $variant->variant_id,
+                            'order_id' => $order->order_id,
+                            'user_id' => Auth::id(),
+                            'action_type' => 'import',
+                            'quantity_change' => (int) $item->quantity,
+                            'stock_after' => $newStock,
+                            'note' => 'Hoàn kho khi huỷ đơn (admin)',
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                    }
                 }
                 // Hoàn trả lượt dùng Voucher nếu có
                 if ($order->voucher_id) {
@@ -423,7 +460,24 @@ class OrderStatisticController extends Controller
                     if (!$variant || $variant->stock_quantity < $item->quantity) {
                         throw new \Exception("Không thể khôi phục đơn hàng vì biến thể sản phẩm [ID: {$item->variant_id}] không đủ tồn kho!");
                     }
+
+                    // Ghi log xuất kho khi khôi phục đơn (admin)
+                    $oldStock = (int) $variant->stock_quantity;
+                    $newStock = $oldStock - (int) $item->quantity;
+
                     $variant->decrement('stock_quantity', $item->quantity);
+
+                    DB::table('inventory_logs')->insert([
+                        'variant_id' => $variant->variant_id,
+                        'order_id' => $order->order_id,
+                        'user_id' => Auth::id(),
+                        'action_type' => 'export',
+                        'quantity_change' => -1 * (int) $item->quantity,
+                        'stock_after' => $newStock,
+                        'note' => 'Xuất kho khi khôi phục đơn (admin)',
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
                 }
                 // Trừ lại lượt dùng Voucher nếu có
                 if ($order->voucher_id) {
