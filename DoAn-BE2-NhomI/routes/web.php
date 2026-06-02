@@ -22,7 +22,6 @@ use App\Http\Controllers\Admin\AttributeController;
 use App\Http\Controllers\Admin\OrderStatisticController;
 use App\Http\Controllers\Admin\RevenueReportController;
 use App\Http\Controllers\Admin\InventoryLogController;
-use App\Http\Controllers\Admin\StockLogController;
 /*
 |--------------------------------------------------------------------------
 | PUBLIC ROUTES
@@ -210,8 +209,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::get('/revenue-reports', [RevenueReportController::class, 'index'])
             ->name('revenue_reports.index');
 
-        Route::get('stock-logs', [StockLogController::class, 'index'])
-            ->name('stock-logs.index');
+        Route::get('stock-logs', function () {
+            return redirect()->route('admin.inventory-logs.index');
+        })->name('stock-logs.index');
         
         Route::get('/login-history', [CrudUserController::class, 'loginHistory'])
             ->name('login.history');

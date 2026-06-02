@@ -258,6 +258,13 @@ class CartController extends Controller
                 ->where('variant_id', $variant->variant_id)
                 ->first();
 
+            $existingQty = $cartItem ? (int)$cartItem->quantity : 0;
+            $available = (int)$variant->stock_quantity;
+
+            if ($existingQty + $quantity > $available) {
+                return redirect()->back()->with('error', 'Không thể thêm vào giỏ hàng: vượt quá tồn kho. Tồn kho hiện có: ' . $available);
+            }
+
             if ($cartItem) {
                 $cartItem->quantity += $quantity;
                 $cartItem->price = $price;
@@ -305,6 +312,13 @@ class CartController extends Controller
         $price = $variant
             ? ($variant->sale_price ?? $variant->price)
             : $product->base_price;
+
+        $currentQty = isset($cart[$cartKey]) ? (int)$cart[$cartKey]['quantity'] : 0;
+        $available = $variant ? (int)$variant->stock_quantity : null;
+
+        if ($available !== null && ($currentQty + $quantity) > $available) {
+            return redirect()->back()->with('error', 'Không thể thêm vào giỏ hàng: vượt quá tồn kho. Tồn kho hiện có: ' . $available);
+        }
 
         if (isset($cart[$cartKey])) {
             $cart[$cartKey]['quantity'] += $quantity;
@@ -396,6 +410,18 @@ class CartController extends Controller
                     ->with('error', 'Không xác định được biến thể sản phẩm!');
             }
 
+            $variant = ProductVariant::where('variant_id', $variantId)->first();
+            if (!$variant) {
+                return redirect()
+                    ->route('cart.index')
+                    ->with('error', 'Biến thể sản phẩm không tồn tại!');
+            }
+            if ($variant->stock_quantity < (int)$request->quantity) {
+                return redirect()
+                    ->route('cart.index')
+                    ->with('error', 'Số lượng yêu cầu vượt quá tồn kho. Tồn kho hiện có: ' . $variant->stock_quantity);
+            }
+
             $userCart = Cart::where('user_id', auth()->id())->first();
 
             if (!$userCart) {
@@ -436,6 +462,22 @@ class CartController extends Controller
             return redirect()
                 ->route('cart.index')
                 ->with('error', 'Sản phẩm không tồn tại trong giỏ hàng!');
+        }
+
+        $variantId = $cart[$request->id]['variant_id'] ?? null;
+        if (empty($variantId) && !empty($cart[$request->id]['product_id'])) {
+            $variantId = DB::table('product_variants')
+                ->where('product_id', $cart[$request->id]['product_id'])
+                ->where('is_active', 1)
+                ->orderBy('variant_id', 'asc')
+                ->value('variant_id');
+        }
+
+        if ($variantId) {
+            $variant = ProductVariant::where('variant_id', $variantId)->first();
+            if ($variant && $variant->stock_quantity < (int)$request->quantity) {
+                return redirect()->route('cart.index')->with('error', 'Số lượng yêu cầu vượt quá tồn kho. Tồn kho hiện có: ' . $variant->stock_quantity);
+            }
         }
 
         $cart[$request->id]['quantity'] = (int) $request->quantity;

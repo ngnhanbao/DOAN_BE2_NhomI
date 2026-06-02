@@ -142,7 +142,7 @@
                 <form action="{{ route('cart.add') }}" method="POST" class="space-y-6 pt-4">
                     @csrf
                     <input type="hidden" name="id" value="{{ $product->product_id }}">
-                    <input type="hidden" name="variant_id" id="selectedVariantId" value="{{ $variants[0]->variant_id ?? '' }}">
+                    <input type="hidden" name="variant_id" id="selectedVariantId" value="{{ $variants->first()->variant_id ?? '' }}">
 
                     {{-- CHỌN SỐ LƯỢNG --}}
                     <div class="flex items-center gap-6">
