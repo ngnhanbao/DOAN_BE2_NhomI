@@ -115,7 +115,10 @@ class CategoryController extends Controller
 
     public function destroy(string $id)
     {
-        $category = \App\Models\Category::findOrFail($id);
+        $category = \App\Models\Category::find($id);
+        if (!$category) {
+            return redirect()->route('admin.categories.index')->with('error', 'Dữ liệu không tồn tại hoặc đã bị xóa');
+        }
         
         if ($category->children()->count() > 0) {
             return redirect()->route('admin.categories.index')->with('error', 'Không thể xóa danh mục đang chứa danh mục con.');

@@ -14,10 +14,23 @@ class ProductImage extends Model
 
     public function getImageUrlAttribute($value)
     {
-        if ($value && strpos($value, '/storage/products/') === 0) {
-            return str_replace('/storage/products/', '/products/', $value);
+        // Normalize stored paths and provide a fallback when file is missing
+        if (!$value) {
+            return '/images/products/default.png';
         }
-        return $value;
+
+        $path = $value;
+        if (strpos($path, '/storage/products/') === 0) {
+            $path = str_replace('/storage/products/', '/products/', $path);
+        }
+
+        $trimmed = ltrim($path, '/');
+        $full = public_path($trimmed);
+        if (file_exists($full)) {
+            return '/' . $trimmed;
+        }
+
+        return '/images/products/default.png';
     }
 
     public function product()

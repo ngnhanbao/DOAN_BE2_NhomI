@@ -81,6 +81,36 @@ class ProductController extends Controller
             $request->merge(['images' => array_values($images)]);
         }
 
+        // Normalize inputs: trim unicode whitespace, convert full-width digits to ASCII
+        $normalize = function($value) {
+            if (is_null($value)) return $value;
+            $v = is_string($value) ? mb_convert_kana($value, 'n') : $value; // convert full-width digits
+            if (is_string($v)) {
+                $v = preg_replace('/^[\p{Z}\s]+|[\p{Z}\s]+$/u', '', $v);
+            }
+            return $v;
+        };
+
+        foreach (['name','slug','description','specs'] as $f) {
+            if ($request->has($f)) {
+                $request->merge([$f => $normalize($request->input($f))]);
+            }
+        }
+
+        // Normalize numeric inputs
+        if ($request->has('base_price')) {
+            $request->merge(['base_price' => $normalize($request->input('base_price'))]);
+        }
+        if ($request->has('variants')) {
+            $variants = $request->input('variants');
+            foreach ($variants as $i => $v) {
+                if (isset($v['price'])) $variants[$i]['price'] = $normalize($v['price']);
+                if (isset($v['sale_price'])) $variants[$i]['sale_price'] = $normalize($v['sale_price']);
+                if (isset($v['stock'])) $variants[$i]['stock'] = mb_convert_kana((string)($v['stock'] ?? ''), 'n');
+            }
+            $request->merge(['variants' => $variants]);
+        }
+
         $request->validate([
             'name'        => 'required|string|max:255',
             'slug'        => 'required|string|max:191|unique:products,slug',
@@ -90,7 +120,7 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'specs'       => 'nullable|string',
             'images.*.url'    => 'nullable|string',
-            'upload_images.*'       => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'upload_images.*'       => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
             'variants.*.sku'        => 'nullable|string|max:100',
             'variants.*.price'      => 'nullable|numeric|min:0',
             'variants.*.sale_price' => 'nullable|numeric|min:0',
@@ -236,7 +266,42 @@ class ProductController extends Controller
     // ─────────────────────────────────────────────
     public function update(Request $request, string $id)
     {
+        // Optimistic lock: check DB updated_at (compare raw DB value to form hidden input)
+        $dbUpdated = \DB::table('products')->where('product_id', $id)->value('updated_at');
+        if ($request->filled('updated_at') && $dbUpdated && $request->input('updated_at') !== (string)$dbUpdated) {
+            return redirect()->back()->with('error', 'Dữ liệu đã thay đổi, vui lòng tải lại trang')->withInput();
+        }
+
         $product = Product::where('product_id', $id)->firstOrFail();
+
+        // Normalize inputs: trim unicode whitespace, convert full-width digits to ASCII
+        $normalize = function($value) {
+            if (is_null($value)) return $value;
+            $v = is_string($value) ? mb_convert_kana($value, 'n') : $value; // convert full-width digits
+            if (is_string($v)) {
+                $v = preg_replace('/^[\p{Z}\s]+|[\p{Z}\s]+$/u', '', $v);
+            }
+            return $v;
+        };
+
+        foreach (['name','slug','description','specs'] as $f) {
+            if ($request->has($f)) {
+                $request->merge([$f => $normalize($request->input($f))]);
+            }
+        }
+
+        if ($request->has('base_price')) {
+            $request->merge(['base_price' => $normalize($request->input('base_price'))]);
+        }
+        if ($request->has('variants')) {
+            $variants = $request->input('variants');
+            foreach ($variants as $i => $v) {
+                if (isset($v['price'])) $variants[$i]['price'] = $normalize($v['price']);
+                if (isset($v['sale_price'])) $variants[$i]['sale_price'] = $normalize($v['sale_price']);
+                if (isset($v['stock'])) $variants[$i]['stock'] = mb_convert_kana((string)($v['stock'] ?? ''), 'n');
+            }
+            $request->merge(['variants' => $variants]);
+        }
 
         // Không còn logic lọc ảnh từ JSON (do form UI đã đổi)
 
@@ -248,7 +313,7 @@ class ProductController extends Controller
             'base_price'  => 'required|numeric|min:0',
             'description' => 'nullable|string',
             'specs'       => 'nullable|string',
-            'upload_images.*'       => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'upload_images.*'       => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
             'variants.*.sku'        => 'nullable|string|max:100',
             'variants.*.price'      => 'nullable|numeric|min:0',
             'variants.*.sale_price' => 'nullable|numeric|min:0',
@@ -379,7 +444,10 @@ class ProductController extends Controller
     // ─────────────────────────────────────────────
     public function destroy(string $id)
     {
-        $product = Product::where('product_id', $id)->firstOrFail();
+        $product = Product::where('product_id', $id)->first();
+        if (!$product) {
+            return redirect()->route('admin.products.index')->with('error', 'Dữ liệu không tồn tại hoặc đã bị xóa');
+        }
         $name    = $product->name;
 
         // Xóa ảnh và biến thể liên quan

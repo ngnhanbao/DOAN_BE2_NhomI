@@ -95,14 +95,36 @@ class PermissionController extends Controller
 
     public function update(Request $request, string $id)
     {
+        // Optimistic lock: check DB updated_at
+        $dbUpdated = \DB::table('users')->where('user_id', $id)->value('updated_at');
+        if ($request->filled('updated_at') && $dbUpdated && $request->input('updated_at') !== (string)$dbUpdated) {
+            return redirect()->back()->with('error', 'Dữ liệu đã thay đổi, vui lòng tải lại trang')->withInput();
+        }
+
         $user = $this->findUser($id);
         if (!$user) {
             return $this->userNotFoundRedirect();
         }
-        $user->update([
-            'permissions' => $request->permissions,
-            'role'        => $request->role ?? $user->role,
+
+        // Validate role and permissions strictly
+        $request->validate([
+            'role' => 'required|in:admin,staff,user',
+            'permissions' => 'nullable|array',
+            'permissions.*' => 'array',
+            'permissions.*.*' => 'in:read,create,update,delete',
+            'updated_at' => 'nullable'
+        ], [
+            'role.required' => 'Vui lòng chọn vai trò hợp lệ.',
+            'role.in' => 'Vai trò không hợp lệ.',
+            'permissions.*.*.in' => 'Quyền truy cập không hợp lệ.'
         ]);
+
+        // Only persist the validated subset
+        $data = [];
+        $data['permissions'] = $request->input('permissions');
+        $data['role'] = $request->input('role');
+
+        $user->update($data);
 
         return redirect()->route('admin.permissions.index')->with('success', 'Cập nhật phân quyền thành công!');
     }

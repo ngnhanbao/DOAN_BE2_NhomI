@@ -85,6 +85,7 @@
     }">
         @csrf
         @method('PUT')
+        <input type="hidden" name="updated_at" value="{{ \DB::table('users')->where('user_id', $user->user_id)->value('updated_at') }}">
 
         @if($errors->any())
             <div class="bg-red-50 border border-red-100 p-4 rounded-xl">

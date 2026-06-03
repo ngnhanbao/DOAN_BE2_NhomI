@@ -32,6 +32,8 @@
     <form action="{{ route('admin.products.update', $product->product_id) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
+        <!-- optimistic lock timestamp to prevent stale updates -->
+        <input type="hidden" name="updated_at" value="{{ \DB::table('products')->where('product_id', $product->product_id)->value('updated_at') }}">
 
         <!-- Header -->
         <div class="mb-8 flex flex-col md:flex-row md:items-start justify-between gap-4 border-b border-gray-200 pb-6">

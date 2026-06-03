@@ -44,6 +44,7 @@
             <form id="editForm" action="{{ route('admin.brands.update', $brand->brand_id) }}" method="POST">
                 @csrf
                 @method('PUT')
+                <input type="hidden" name="updated_at" value="{{ \DB::table('brands')->where('brand_id', $brand->brand_id)->value('updated_at') }}">
 
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <div class="flex items-center gap-2 mb-5">

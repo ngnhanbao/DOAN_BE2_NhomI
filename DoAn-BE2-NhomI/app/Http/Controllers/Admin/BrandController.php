@@ -86,7 +86,32 @@ class BrandController extends Controller
 
     public function update(Request $request, string $id)
     {
-        $brand = Brand::findOrFail($id);
+        // Optimistic lock: check DB updated_at to avoid stale updates
+        $dbUpdated = \DB::table('brands')->where('brand_id', $id)->value('updated_at');
+        if ($request->filled('updated_at') && $dbUpdated && $request->input('updated_at') !== (string)$dbUpdated) {
+            return redirect()->back()->with('error', 'Dữ liệu đã thay đổi, vui lòng tải lại trang')->withInput();
+        }
+
+        $brand = Brand::find($id);
+        if (!$brand) {
+            return redirect()->route('admin.brands.index')->with('error', 'Dữ liệu không tồn tại hoặc đã bị xóa');
+        }
+
+        // Normalize inputs
+        $normalize = function($value) {
+            if (is_null($value)) return $value;
+            $v = is_string($value) ? mb_convert_kana($value, 'n') : $value;
+            if (is_string($v)) {
+                $v = preg_replace('/^[\p{Z}\s]+|[\p{Z}\s]+$/u', '', $v);
+            }
+            return $v;
+        };
+
+        foreach (['name','slug','description','logo_url'] as $f) {
+            if ($request->has($f)) {
+                $request->merge([$f => $normalize($request->input($f))]);
+            }
+        }
 
         $request->validate([
             'name' => 'required|max:100',
@@ -115,7 +140,10 @@ class BrandController extends Controller
     // =====================================================
     public function destroy(string $id)
     {
-        $brand = Brand::findOrFail($id);
+        $brand = Brand::find($id);
+        if (!$brand) {
+            return redirect()->route('admin.brands.index')->with('error', 'Dữ liệu không tồn tại hoặc đã bị xóa');
+        }
         $brand->delete();
         
         return redirect()->route('admin.brands.index')->with('success', 'Đã xóa thương hiệu thành công!');

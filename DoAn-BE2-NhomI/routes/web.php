@@ -22,6 +22,9 @@ use App\Http\Controllers\Admin\AttributeController;
 use App\Http\Controllers\Admin\OrderStatisticController;
 use App\Http\Controllers\Admin\RevenueReportController;
 use App\Http\Controllers\Admin\InventoryLogController;
+
+// Ensure route {id} params are numeric to avoid invalid IDs being passed to controllers
+Route::pattern('id', '[0-9]+');
 /*
 |--------------------------------------------------------------------------
 | PUBLIC ROUTES

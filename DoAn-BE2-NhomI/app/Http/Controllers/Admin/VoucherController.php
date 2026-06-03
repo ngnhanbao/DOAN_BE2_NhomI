@@ -30,7 +30,7 @@ class VoucherController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'code' => 'required|unique:vouchers,code',
+            'code' => 'required|string|max:100|unique:vouchers,code',
             'type' => 'required|in:percent,fixed',
             'value' => 'required|numeric|min:1',
             'min_order_value' => 'required|numeric|min:0',
@@ -41,6 +41,7 @@ class VoucherController extends Controller
         ], [
             'code.required' => 'Vui lòng nhập mã voucher.',
             'code.unique' => 'Mã voucher này đã tồn tại trong hệ thống.',
+            'code.max' => 'Mã voucher không được vượt quá 100 ký tự.',
             'type.required' => 'Vui lòng chọn loại giảm giá.',
             'value.required' => 'Vui lòng nhập giá trị giảm.',
             'value.numeric' => 'Giá trị giảm phải là chữ số.',
@@ -93,8 +94,32 @@ class VoucherController extends Controller
 
     public function update(Request $request, $id)
     {
-        $voucher = Voucher::findOrFail($id);
-        
+        // Optimistic lock: check DB updated_at
+        $dbUpdated = \DB::table('vouchers')->where('voucher_id', $id)->value('updated_at');
+        if ($request->filled('updated_at') && $dbUpdated && $request->input('updated_at') !== (string)$dbUpdated) {
+            return redirect()->back()->with('error', 'Dữ liệu đã thay đổi, vui lòng tải lại trang')->withInput();
+        }
+
+        $voucher = Voucher::find($id);
+        if (!$voucher) {
+            return redirect()->route('admin.vouchers.index')->with('error', 'Dữ liệu không tồn tại hoặc đã bị xóa');
+        }
+
+        // Normalize inputs
+        $normalize = function($value) {
+            if (is_null($value)) return $value;
+            $v = is_string($value) ? mb_convert_kana($value, 'n') : $value;
+            if (is_string($v)) {
+                $v = preg_replace('/^[\p{Z}\s]+|[\p{Z}\s]+$/u', '', $v);
+            }
+            return $v;
+        };
+        foreach (['code','type'] as $f) {
+            if ($request->has($f)) {
+                $request->merge([$f => $normalize($request->input($f))]);
+            }
+        }
+
         $request->validate([
             'code' => 'required|unique:vouchers,code,' . $id . ',voucher_id',
             'type' => 'required|in:percent,fixed',
@@ -126,7 +151,11 @@ class VoucherController extends Controller
 
     public function destroy($id)
     {
-        Voucher::destroy($id);
+        $voucher = Voucher::find($id);
+        if (!$voucher) {
+            return redirect()->route('admin.vouchers.index')->with('error', 'Dữ liệu không tồn tại hoặc đã bị xóa');
+        }
+        $voucher->delete();
         return redirect()->route('admin.vouchers.index')->with('success', 'Xóa voucher thành công!');
     }
 
