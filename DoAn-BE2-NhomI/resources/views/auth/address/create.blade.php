@@ -190,8 +190,8 @@
 
                             </label>
 
-                            <input type="text" name="full_name" maxlength="100" value="{{ old('full_name') }}" class="w-full border-0 border-b-2 rounded-md transition border-gray-200
-                                                    focus:border-blue-900 focus:ring-0 py-3 px-0">
+                            <input type="text" name="full_name" maxlength="50" value="{{ old('full_name') }}" class="w-full border-0 border-b-2 rounded-md transition border-gray-200
+                                                            focus:border-blue-900 focus:ring-0 py-3 px-0">
                             <p id="fullNameError" class="text-red-500 text-sm mt-2 hidden">
                             </p>
 
@@ -223,7 +223,7 @@
 
                             <input type="text" name="phone" value="{{ old('phone') }}" maxlength="10" inputmode="numeric"
                                 class="w-full border-0 border-b-2 rounded-md transition border-gray-200
-                focus:border-blue-900 focus:ring-0 py-3 px-0">
+                        focus:border-blue-900 focus:ring-0 py-3 px-0">
 
                             <p id="phoneError" class="text-red-500 text-sm mt-2 hidden">
                             </p>
@@ -455,7 +455,8 @@
 
                 </button>
 
-                <button onclick="submitAddressForm()" class="bg-blue-900 text-white px-5 py-2 rounded-xl">
+                <button id="confirmSaveBtn" onclick="submitAddressForm()"
+                    class="bg-blue-900 text-white px-5 py-2 rounded-xl">
 
                     Có
 
@@ -533,19 +534,66 @@
         // =============================
         // FULL NAME
         // =============================
-        fullName.addEventListener('input', function () {
+        fullName.addEventListener(
+            'blur',
+            function () {
 
-            this.value = this.value.replace(
-                /[0-9!@#$%^&*()_+=\[\]{};:'"\\|,.<>/?`~-]/g,
-                ''
-            );
+                const error =
+                    document.getElementById(
+                        'fullNameError'
+                    );
 
-            if (this.value.length > 100) {
-                this.value = this.value.slice(0, 100);
+                this.value = this.value
+                    .trim()
+                    .replace(/\s+/g, ' ');
+
+                const value =
+                    this.value;
+
+                if (value === '') {
+
+                    error.innerHTML =
+                        'Họ tên không được để trống hoặc chỉ chứa khoảng trắng';
+
+                    error.classList.remove(
+                        'hidden'
+                    );
+
+                    return;
+                }
+
+                if (value.length > 50) {
+
+                    error.innerHTML =
+                        'Họ tên tối đa 50 ký tự';
+
+                    error.classList.remove(
+                        'hidden'
+                    );
+
+                    return;
+                }
+
+                if (
+                    !/^[a-zA-ZÀ-ỹ\s]+$/.test(value)
+                ) {
+
+                    error.innerHTML =
+                        'Họ tên không được chứa số hoặc ký tự đặc biệt';
+
+                    error.classList.remove(
+                        'hidden'
+                    );
+
+                    return;
+                }
+
+                error.classList.add(
+                    'hidden'
+                );
+
             }
-
-        });
-
+        );
         // =============================
         // PHONE
         // =============================
@@ -597,35 +645,7 @@
         const oldWard =
             ward.dataset.old;
 
-        fullName.addEventListener(
-            'blur',
-            function () {
 
-                const error =
-                    document.getElementById(
-                        'fullNameError'
-                    );
-
-                if (
-                    this.value.trim() === ''
-                ) {
-
-                    error.innerHTML =
-                        'Vui lòng nhập họ tên';
-
-                    error.classList.remove(
-                        'hidden'
-                    );
-
-                    return;
-                }
-
-                error.classList.add(
-                    'hidden'
-                );
-
-            }
-        );
         phone.addEventListener(
             'blur',
             function () {
@@ -669,12 +689,41 @@
                         'streetError'
                     );
 
+                this.value = this.value.trim();
+
+                const value =
+                    this.value;
+
+                if (value === '') {
+
+                    error.innerHTML =
+                        'Vui lòng nhập địa chỉ cụ thể';
+
+                    error.classList.remove(
+                        'hidden'
+                    );
+
+                    return;
+                }
+
+                if (value.length > 255) {
+
+                    error.innerHTML =
+                        'Địa chỉ tối đa 255 ký tự';
+
+                    error.classList.remove(
+                        'hidden'
+                    );
+
+                    return;
+                }
+
                 if (
-                    this.value.trim() === ''
+                    !/^[a-zA-ZÀ-ỹ0-9\s\/\-,.]+$/.test(value)
                 ) {
 
                     error.innerHTML =
-                        'Vui lòng nhập địa chỉ';
+                        'Địa chỉ cụ thể chỉ được chứa chữ, số và các ký tự / - , .';
 
                     error.classList.remove(
                         'hidden'
@@ -689,8 +738,6 @@
 
             }
         );
-
-
 
         // =====================================================
         // LOAD PROVINCES
@@ -935,26 +982,51 @@
         // =====================================================
         function openSaveModal() {
 
+            fullName.dispatchEvent(
+                new Event('blur')
+            );
+
+            phone.dispatchEvent(
+                new Event('blur')
+            );
+
+            street.dispatchEvent(
+                new Event('blur')
+            );
+
+            if (
+                !document.getElementById(
+                    'fullNameError'
+                ).classList.contains('hidden')
+            ) {
+                return;
+            }
+
+            if (
+                !document.getElementById(
+                    'phoneError'
+                ).classList.contains('hidden')
+            ) {
+                return;
+            }
+
+            if (
+                !document.getElementById(
+                    'streetError'
+                ).classList.contains('hidden')
+            ) {
+                return;
+            }
+
             document
-                .getElementById(
-                    'saveModal'
-                )
-                .classList.remove(
-                    'hidden'
-                );
-
-
+                .getElementById('saveModal')
+                .classList.remove('hidden');
 
             document
-                .getElementById(
-                    'saveModal'
-                )
-                .classList.add(
-                    'flex'
-                );
+                .getElementById('saveModal')
+                .classList.add('flex');
 
         }
-
 
 
 
@@ -990,38 +1062,25 @@
         // =====================================================
         function submitAddressForm() {
 
-            const button =
+            const confirmBtn =
                 document.getElementById(
-                    'saveButton'
+                    'confirmSaveBtn'
                 );
 
+            if (confirmBtn.disabled) {
+                return;
+            }
 
+            confirmBtn.disabled = true;
 
-            const text =
-                document.getElementById(
-                    'saveButtonText'
-                );
+            confirmBtn.innerHTML =
+                'Đang xử lý...';
 
-
-
-            text.innerHTML =
-                'ĐANG LƯU... ⏳';
-
-
-
-            button.disabled = true;
-
-
-
-            setTimeout(() => {
-
-                document
-                    .getElementById(
-                        'addressForm'
-                    )
-                    .submit();
-
-            }, 1000);
+            document
+                .getElementById(
+                    'addressForm'
+                )
+                .submit();
 
         }
 
