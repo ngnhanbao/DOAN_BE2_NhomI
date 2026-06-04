@@ -65,7 +65,7 @@ class ShippingAddressController extends Controller
     // =====================================================
     // FORM EDIT
     // =====================================================
-   public function edit($id)
+    public function edit($id)
     {
 
         $address =
@@ -312,11 +312,11 @@ class ShippingAddressController extends Controller
 
             'ward' =>
                 'required',
- 'street_address' => [
-    'required',
-    'max:255',
-    'regex:/^[\pL\pN\s\/\-\,\.]+$/u'
-],
+            'street_address' => [
+                'required',
+                'max:255',
+                'regex:/^[\pL\pN\s\/\-\,\.]+$/u'
+            ],
 
         ], [
 
@@ -338,9 +338,9 @@ class ShippingAddressController extends Controller
             'ward.required' =>
                 'Vui lòng chọn phường/xã.',
 
-           'street_address.required' => 'Vui lòng nhập địa chỉ cụ thể.',
-'street_address.max' => 'Địa chỉ cụ thể không được vượt quá 255 ký tự.',
-'street_address.regex' => 'Địa chỉ cụ thể không được chứa ký tự đặc biệt.',
+            'street_address.required' => 'Vui lòng nhập địa chỉ cụ thể.',
+            'street_address.max' => 'Địa chỉ cụ thể không được vượt quá 255 ký tự.',
+            'street_address.regex' => 'Địa chỉ cụ thể không được chứa ký tự đặc biệt.',
         ]);
 
 
