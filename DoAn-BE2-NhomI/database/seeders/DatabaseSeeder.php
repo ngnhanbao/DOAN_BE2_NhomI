@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\ShippingFee;
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -13,11 +13,21 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // Thứ tự gọi rất quan trọng để tránh lỗi khóa ngoại (Foreign Key)
+        $this->call([
+            // 1. Chạy UserSeeder trước (nếu bạn đã có file này)
+            UserSeeder::class,
+            ShippingAddressSeeder::class,
+            ShippingFeeSeeder::class,
+            AttributeSeeder::class,
+            
+            // 2. Chạy DataSampleSeeder để đổ dữ liệu Sản phẩm, Review, Ảnh...
+            DataSampleSeeder::class,
+            DefaultProductVariantSeeder::class,
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+            //3.  đổ dữ liệu đơn hàng
+            OrderSeeder::class,
+            OrderItemSeeder::class,
         ]);
     }
 }
